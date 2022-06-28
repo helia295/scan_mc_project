@@ -1,0 +1,7 @@
+1. pip3 install selenium
+
+2. pip3 install webdriver-manager
+
+3. ChromeDriver (https://chromedriver.chromium.org/downloads) 
+
+4. pip3 install dash
