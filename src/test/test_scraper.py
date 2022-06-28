@@ -69,7 +69,7 @@ def test_get_all_links_on_URL_length():
 
     assert len(url_list) <= length
 
-'''
+''' ### Mỗi lần website lại thay đổi nên khó lấy đc chính xác các links giống lần trc
 @pytest.mark.dependency(depends=["test_configure_chrome_driver"])
 def test_get_all_links_on_URL_links():
     length = 3

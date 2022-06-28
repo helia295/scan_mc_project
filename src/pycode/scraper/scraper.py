@@ -11,7 +11,7 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
 #MAX_LINKS = 5     # max follow links per merchant
-DRIVER_PATH="./config/chromedriver"
+#DRIVER_PATH="./config/chromedriver"
 
 ### Read data from CSV to get merchants' URLs
 def get_URLs_to_list(filename):
@@ -66,7 +66,7 @@ def configure_chrome_driver():
 
     # Instantiate the Webdriver: Mention the executable path of the webdriver you have downloaded
     # if driver is in PATH, no need to provide executable_path
-    driver = webdriver.Chrome(DRIVER_PATH, service=Service(ChromeDriverManager().install()), options=options)
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     
     return driver
 
@@ -193,13 +193,13 @@ def findKeyword(driver, website, wordlist, stt, num_links, related_urls):
                     if dom not in seen_domain:
                         f.write(dom + '\n')
                         seen_domain.append(dom)
-                    external_links = True
+                        external_links = True
                 elif ("http://" in url) and ("https://" not in url):
                     dom = (url.replace("http://", "")).split("/")[0]
                     if dom not in seen_domain:
                         f.write(dom + '\n')
                         seen_domain.append(dom)
-                    external_links = True
+                        external_links = True
             if "login" in url:
                 user_login = True
     f.close()

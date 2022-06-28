@@ -19,7 +19,9 @@ config = dotenv_values("./.env")
 UPLOAD_DIRECTORY = config['UPLOAD_DIRECTORY']
 SAMPLE_FILE = config['SAMPLE_FILE']
 RELATED_URLS = config['RELATED_URLS']
-LOGO_PATH = "../assets/logo.jpg"
+LOGO_PATH = "./assets/logo.png"
+
+encoded_image = base64.b64encode(open(LOGO_PATH, 'rb').read())
 
 df = pd.read_csv(SAMPLE_FILE)
 
@@ -43,26 +45,26 @@ app.layout = html.Div([
             children='CÔNG CỤ SCAN WEBSITE CỦA MERCHANT',
             style={
                 'textAlign': 'left',
-                'font-family': "Times New Roman",
+                'fontFamily': "Times New Roman",
                 #'display':'inline-block',
                 'fontSize': 28,
                 'fontWeight': 'bold',
-                "marginLeft": "335px",
+                "marginLeft": "320px",
                 "marginBottom": "10px",
                 #"color": "#0059b3",
                 'display':'inline',}
     ),
 
-    html.Div([html.Img(src=LOGO_PATH,         #app.get_asset_url('logo.jpg'), 
+    html.Div([html.Img(src=("data:image/png;base64,{}").format(encoded_image.decode()),        #app.get_asset_url('logo.png'), 
                 style = {'display':'inline', 
                         'width': '5%', 
                         'height': '4%',})
-            ], style={'textAlign': 'right','display':'inline', "marginLeft": "250px", }
+            ], style={'textAlign': 'right','display':'inline', "marginLeft": "205px", }
     ),
     
     html.H2("Bước 1: Upload 2 File Keywords (xls) & Merchants (csv)", 
         style = {
-            'font-family': 'Times New Roman',
+            'fontFamily': 'Times New Roman',
             'fontSize': 21,
             'fontWeight': 'bold',
             "marginLeft": "30px",}
@@ -70,7 +72,7 @@ app.layout = html.Div([
 
     html.H4("Hãy upload file danh sách Keywords (định dạng xls) và file danh sách Merchants (định dạng csv)!",
             style = {
-                'font-family': 'Times New Roman',
+                'fontFamily': 'Times New Roman',
                 'fontSize': 15,
                 'fontStyle': 'italic',
                 'textAlign': 'center',
@@ -91,7 +93,7 @@ app.layout = html.Div([
             #"borderRadius": "2px",
             "textAlign": "center",
             "marginLeft": "10px",
-            'font-family': 'Times New Roman',
+            'fontFamily': 'Times New Roman',
             "color": "gray",
             'fontSize': 15,
         },
@@ -100,7 +102,7 @@ app.layout = html.Div([
     
     html.H3("Danh sách File đã tải lên:",
             style = {
-                'font-family': 'Times New Roman',
+                'fontFamily': 'Times New Roman',
                 'fontSize': 18,
                 'fontWeight': 'bold',
                 "marginLeft": "30px",
@@ -110,13 +112,13 @@ app.layout = html.Div([
 
     html.Ul(id="file-list", 
             style = {
-                'font-family': 'Times New Roman',
+                'fontFamily': 'Times New Roman',
                 "marginLeft": "45px",}
     ),
 
     html.H2("Bước 2: Nhập số lượng link để scan cho mỗi Merchant",
             style = {
-                'font-family': 'Times New Roman',
+                'fontFamily': 'Times New Roman',
                 'fontSize': 21,
                 'fontWeight': 'bold',
                 "marginLeft": "30px",}
@@ -124,7 +126,7 @@ app.layout = html.Div([
 
     html.H4("Giới hạn số lượng link phải scan cho mỗi Merchant sẽ giúp đẩy nhanh kết quả. Gợi ý: <=50 links/merchant.",
             style = {
-                'font-family': 'Times New Roman',
+                'fontFamily': 'Times New Roman',
                 'fontSize': 15,
                 'fontStyle': 'italic',
                 'textAlign': 'center',
@@ -139,7 +141,7 @@ app.layout = html.Div([
                     "height": "31px", 
                     "width": "100%",
                     "marginBottom": "5px", 
-                    'font-family': 'Times New Roman',
+                    'fontFamily': 'Times New Roman',
                     "color": "black"},
             debounce=True,
             #required = "required",
@@ -147,7 +149,7 @@ app.layout = html.Div([
 
     html.H2("Bước 3: Bấm nút chạy lấy Kết quả",
             style = {
-                'font-family': 'Times New Roman',
+                'fontFamily': 'Times New Roman',
                 'fontSize': 21,
                 'fontWeight': 'bold',
                 "marginLeft": "30px",
@@ -156,7 +158,7 @@ app.layout = html.Div([
 
     
     html.Button('Chạy chương trình', id='run', n_clicks=0,
-                style = {'background-color': 'white',
+                style = {'backgroundColor': 'white',
                         'color': '#004d99',
                         'height': '30px',
                         'width': '200px',
@@ -164,18 +166,18 @@ app.layout = html.Div([
                         "borderStyle": "solid",
                         'borderColor': "#004d99",
                         'textAlign': 'center',
-                        'font-family': 'Times New Roman',
+                        'fontFamily': 'Times New Roman',
                         'fontSize': 18,
                         "display": "block",
                         "marginLeft": "auto",
                         "marginRight": "auto",
                         "marginBottom": "15px",
-                        'vertical-align': 'middle',}
+                        'verticalAlign': 'middle',}
     ),
 
     html.Div(id = "button-validation", 
             style = {
-                'font-family': 'Times New Roman',
+                'fontFamily': 'Times New Roman',
                 'fontSize': 15,
                 'fontStyle': 'italic',
                 'textAlign': 'center',
@@ -187,7 +189,7 @@ app.layout = html.Div([
 
     html.Div(id = "button-running", 
             style = {
-                'font-family': 'Times New Roman',
+                'fontFamily': 'Times New Roman',
                 'fontSize': 15,
                 'fontStyle': 'italic',
                 'textAlign': 'center',
@@ -229,7 +231,7 @@ app.layout = html.Div([
                     style_data={
                         'color': 'black',
                         'backgroundColor': 'white',
-                        'font-family':'Times New Roman',
+                        'fontFamily':'Times New Roman',
                         'overflowX': 'auto'
                     },
                     style_data_conditional=[
@@ -243,7 +245,7 @@ app.layout = html.Div([
                         'color': 'black',
                         'fontWeight': 'bold',
                         'fontSize': 16,
-                        'font-family':'Times New Roman',
+                        'fontFamily':'Times New Roman',
                         'textAlign': 'center',
                     }
                     )]
@@ -295,9 +297,9 @@ def update_output(uploaded_filenames, uploaded_file_contents):
 
     files = uploaded_files()
     if len(files) == 0:
-        return [html.Li("Chưa có file nào!", style = {"color": "#004d99","marginBottom": "10px",'font-family':'Times New Roman',})]
+        return [html.Li("Chưa có file nào!", style = {"color": "#004d99","marginBottom": "10px",'fontFamily':'Times New Roman',})]
     else:
-        return [html.Li(file_download_link(filename), style = {"color": "#004d99","marginBottom": "10px",'font-family':'Times New Roman',}) for filename in files]
+        return [html.Li(file_download_link(filename), style = {"color": "#004d99","marginBottom": "10px",'fontFamily':'Times New Roman',}) for filename in files]
 
 
 @app.callback(
@@ -329,7 +331,7 @@ def generate_table(uploaded_filenames, uploaded_file_contents, value, n_clicks):
     #changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
     #if ("run" in changed_id):
         if (n_clicks != None) and (n_clicks > 0):
-            from scraper.scraper import get_URLs_to_list, getKeywordstoList, configure_chrome_driver, findKeyword
+            from src.pycode.scraper.scraper import get_URLs_to_list, getKeywordstoList, configure_chrome_driver, findKeyword
             
             for filename in os.listdir(UPLOAD_DIRECTORY):
                 path = os.path.join(UPLOAD_DIRECTORY, filename)
