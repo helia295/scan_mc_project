@@ -136,7 +136,7 @@ app.layout = html.Div([
                 'fontWeight': 'normal',}
     ),
 
-    dcc.Input(id="num_links", type="number", 
+    dcc.Input(id="num_links", type="number", min=1,
             placeholder="Điền số links/merchant vào đây.", 
             style={'textAlign': 'center',
                     'fontSize': 15,
