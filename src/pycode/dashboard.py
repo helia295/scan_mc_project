@@ -40,27 +40,33 @@ def download(path):
 
 
 app.layout = html.Div([
-    
-    html.H1(
-            children='CÔNG CỤ SCAN WEBSITE CỦA MERCHANT',
-            style={
-                'textAlign': 'left',
-                'fontFamily': "Times New Roman",
-                #'display':'inline-block',
-                'fontSize': 28,
-                'fontWeight': 'bold',
-                "marginLeft": "320px",
-                "marginBottom": "10px",
-                #"color": "#0059b3",
-                'display':'inline',}
-    ),
-
-    html.Div([html.Img(src=("data:image/png;base64,{}").format(encoded_image.decode()),        #app.get_asset_url('logo.png'), 
+    html.Div([
+        html.H1(
+                children='CÔNG CỤ SCAN WEBSITE CỦA MERCHANT',
+                style={
+                    'textAlign': 'center',
+                    'fontFamily': "Times New Roman",
+                    'fontSize': 28,
+                    'fontWeight': 'bold',
+                    #"color": "#0059b3",
+                    'display':'inline',
+                    }
+        ),
+        html.Img(src=("data:image/png;base64,{}").format(encoded_image.decode()),        #app.get_asset_url('logo.png'), 
                 style = {'display':'inline', 
                         'width': '5%', 
-                        'height': '4%',})
-            ], style={'textAlign': 'right','display':'inline', "marginLeft": "205px", }
-    ),
+                        'height': '4%',
+                        "marginLeft": "5%",
+                        }
+        ),
+    ], style = {
+        'textAlign': 'center',
+        'top': '20%',
+        'bottom': '20%',
+        'width':'100%',
+        "paddingLeft": "auto",
+        "paddingBottom": "auto",
+    }),
     
     html.H2("Bước 1: Upload 2 File Keywords (xls) & Merchants (csv)", 
         style = {
@@ -90,7 +96,7 @@ app.layout = html.Div([
             "lineHeight": "31px",
             "borderWidth": "1px",
             "borderStyle": "solid",
-            #"borderRadius": "2px",
+            "borderRadius": "2px",
             "textAlign": "center",
             "marginLeft": "10px",
             'fontFamily': 'Times New Roman',
@@ -350,7 +356,7 @@ def generate_table(uploaded_filenames, uploaded_file_contents, value, n_clicks):
             driver = configure_chrome_driver()
             
             stt = 0
-            for web in start_URLs[0:3]:
+            for web in start_URLs[0:5]:
                 web_dict = findKeyword(driver, web, wordlist, stt, value, RELATED_URLS)
                 if web_dict != {}:
                     #print(web_dict)

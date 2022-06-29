@@ -5,3 +5,9 @@
 3. ChromeDriver (https://chromedriver.chromium.org/downloads) 
 
 4. pip3 install dash
+
+5. pip3 install python-dotenv
+
+6. pip3 install beautifulsoup4
+
+7. pip3 install pandas
