@@ -40,46 +40,43 @@ def download(path):
 
 
 app.layout = html.Div([
-    html.Div([
+    html.Div(children=[
         html.H1(
-                children='CÔNG CỤ SCAN WEBSITE CỦA MERCHANT',
-                style={
-                    'textAlign': 'center',
-                    'fontFamily': "Times New Roman",
-                    'fontSize': 28,
-                    'fontWeight': 'bold',
-                    #"color": "#0059b3",
-                    'display':'inline',
-                    }
+            children='CÔNG CỤ SCAN WEBSITE CỦA MERCHANT',
+            style={
+                'fontFamily': "Times New Roman",
+                #'display':'inline-block',
+                'fontSize': '28',
+                'fontWeight': 'bold',
+                #"color": "#0059b3",
+                'display':'inline', 
+                'paddingTop': '30px'}
         ),
-        html.Img(src=("data:image/png;base64,{}").format(encoded_image.decode()),        #app.get_asset_url('logo.png'), 
-                style = {'display':'inline', 
-                        'width': '5%', 
-                        'height': '4%',
-                        "marginLeft": "5%",
-                        }
-        ),
-    ], style = {
+        html.Img(src=("data:image/png;base64,{}").format(encoded_image.decode()),
+                    style = {'display':'inline', 
+                            'width': '95px', 
+                            'height': '95px',
+                            'padding': '15px'
+                            })
+    ], style={
+        'display': 'flex',
         'textAlign': 'center',
-        'top': '20%',
-        'bottom': '20%',
-        'width':'100%',
-        "paddingLeft": "auto",
-        "paddingBottom": "auto",
+        'alignItem': 'center',
+        'justifyContent': 'center',
     }),
     
     html.H2("Bước 1: Upload 2 File Keywords (xls) & Merchants (csv)", 
         style = {
             'fontFamily': 'Times New Roman',
-            'fontSize': 21,
+            'fontSize': '21',
             'fontWeight': 'bold',
-            "marginLeft": "30px",}
+            'marginLeft': '30px',}
     ),
 
     html.H4("Hãy upload file danh sách Keywords (định dạng xls) và file danh sách Merchants (định dạng csv)!",
             style = {
                 'fontFamily': 'Times New Roman',
-                'fontSize': 15,
+                'fontSize': '15',
                 'fontStyle': 'italic',
                 'textAlign': 'center',
                 'fontWeight': 'normal',}
@@ -99,9 +96,9 @@ app.layout = html.Div([
             "borderRadius": "2px",
             "textAlign": "center",
             "marginLeft": "10px",
-            'fontFamily': 'Times New Roman',
+            "fontFamily": "Times New Roman",
             "color": "gray",
-            'fontSize': 15,
+            "fontSize": "15",
         },
         multiple=True,
     ),
@@ -109,17 +106,17 @@ app.layout = html.Div([
     html.H3("Danh sách File đã tải lên:",
             style = {
                 'fontFamily': 'Times New Roman',
-                'fontSize': 18,
+                'fontSize': '18',
                 'fontWeight': 'bold',
-                "marginLeft": "30px",
-                "marginTop": "20px",
-                "color": "#004d99",}
+                'marginLeft': '30px',
+                'marginTop': '20px',
+                'color': '#004d99',}
     ),
 
     html.Ul(id="file-list", 
             style = {
                 'fontFamily': 'Times New Roman',
-                "marginLeft": "45px",}
+                'marginLeft': '45px',}
     ),
 
     html.H2("Bước 2: Nhập số lượng link để scan cho mỗi Merchant",
@@ -127,7 +124,7 @@ app.layout = html.Div([
                 'fontFamily': 'Times New Roman',
                 'fontSize': 21,
                 'fontWeight': 'bold',
-                "marginLeft": "30px",}
+                'marginLeft': '30px',}
     ),
 
     html.H4("Giới hạn số lượng link phải scan cho mỗi Merchant sẽ giúp đẩy nhanh kết quả. Gợi ý: <=50 links/merchant.",
@@ -144,11 +141,11 @@ app.layout = html.Div([
             style={'textAlign': 'center',
                     'fontSize': 15,
                     'marginLeft':'10px',
-                    "height": "31px", 
-                    "width": "100%",
-                    "marginBottom": "5px", 
+                    'height': '31px', 
+                    'width': '100%',
+                    'marginBottom': '5px', 
                     'fontFamily': 'Times New Roman',
-                    "color": "black"},
+                    'color': 'black'},
             debounce=True,
             #required = "required",
     ),
@@ -158,8 +155,8 @@ app.layout = html.Div([
                 'fontFamily': 'Times New Roman',
                 'fontSize': 21,
                 'fontWeight': 'bold',
-                "marginLeft": "30px",
-                "marginBottom": "10px",}
+                'marginLeft': '30px',
+                'marginBottom': '10px',}
     ),
 
     
@@ -168,16 +165,16 @@ app.layout = html.Div([
                         'color': '#004d99',
                         'height': '30px',
                         'width': '200px',
-                        "borderWidth": "1px",
-                        "borderStyle": "solid",
-                        'borderColor': "#004d99",
+                        'borderWidth': '1px',
+                        'borderStyle': 'solid',
+                        'borderColor': '#004d99',
                         'textAlign': 'center',
                         'fontFamily': 'Times New Roman',
                         'fontSize': 18,
-                        "display": "block",
-                        "marginLeft": "auto",
-                        "marginRight": "auto",
-                        "marginBottom": "15px",
+                        'display': 'block',
+                        'marginLeft': 'auto',
+                        'marginRight': 'auto',
+                        'marginBottom': '15px',
                         'verticalAlign': 'middle',}
     ),
 
@@ -188,9 +185,9 @@ app.layout = html.Div([
                 'fontStyle': 'italic',
                 'textAlign': 'center',
                 'fontWeight': 'normal',
-                'color': "red",
-                "marginBottom": "20px",
-                "persistence": "False"}
+                'color': 'red',
+                'marginBottom': '20px',
+                'persistence': 'False'}
     ),
 
     html.Div(id = "button-running", 
@@ -201,8 +198,8 @@ app.layout = html.Div([
                 'textAlign': 'center',
                 'fontWeight': 'normal',
                 'color': "blue",
-                "marginBottom": "20px",
-                "persistence": "False"}
+                'marginBottom': '20px',
+                'persistence': 'False'}
     ),
     dcc.Loading(
             id="loading-table",
@@ -257,15 +254,15 @@ app.layout = html.Div([
                     )]
             ),
         style = {
-            "position": "absolute",
-            "marginBottom": "700px",
+            'position': 'absolute',
+            'marginBottom': '700px',
         }
     ),
 ], style = {
-    "marginRight": "40px",
-    "marginLeft": "25px",
-    "marginTop": "10px",
-    "marginBottom": "30px",}
+    'marginRight': '40px',
+    'marginLeft': '25px',
+    'marginTop': '10px',
+    'marginBottom': '30px',}
 )
 
 
@@ -303,9 +300,9 @@ def update_output(uploaded_filenames, uploaded_file_contents):
 
     files = uploaded_files()
     if len(files) == 0:
-        return [html.Li("Chưa có file nào!", style = {"color": "#004d99","marginBottom": "10px",'fontFamily':'Times New Roman',})]
+        return [html.Li("Chưa có file nào!", style = {"color": "#004d99","marginBottom": "10px","fontFamily":"Times New Roman",})]
     else:
-        return [html.Li(file_download_link(filename), style = {"color": "#004d99","marginBottom": "10px",'fontFamily':'Times New Roman',}) for filename in files]
+        return [html.Li(file_download_link(filename), style = {"color": "#004d99","marginBottom": "10px","fontFamily":"Times New Roman",}) for filename in files]
 
 
 @app.callback(
