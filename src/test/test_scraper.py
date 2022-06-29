@@ -112,4 +112,31 @@ def test_findKeyword_https_url():
     assert web_dict == {'STT': 1, 'Website': 'https://dichvucong.binhduong.gov.vn/', 'Keywords tìm thấy': "['dịch vụ', 'hành chính']", 'Link liên kết ngoài': 'Không', 'Người dùng đăng nhập': 'Không', 'Yêu cầu nạp tiền': 'Không'}
 
 
+@pytest.mark.dependency(depends=["test_configure_chrome_driver"])
+def test_findKeyword_wordlist_avail():
+
+    start_URL = "https://dichvucong.binhduong.gov.vn/"
+    wordlist = ["dịch vụ", "hành chính"] # có, có, ko có, ko có
+    driver = configure_chrome_driver()
+    num_links = 1
+    RELATED_URLS = "/Users/heliadinh/Desktop/scan_MC_project/scan_MC_files/urls/"
+
+    web_dict = findKeyword(driver, start_URL, wordlist, 1, num_links, RELATED_URLS)
+    
+    assert web_dict == {'STT': 1, 'Website': 'https://dichvucong.binhduong.gov.vn/', 'Keywords tìm thấy': "['dịch vụ', 'hành chính']", 'Link liên kết ngoài': 'Không', 'Người dùng đăng nhập': 'Không', 'Yêu cầu nạp tiền': 'Không'}
+
+
+@pytest.mark.dependency(depends=["test_configure_chrome_driver"])
+def test_findKeyword_wordlist_unavail():
+
+    start_URL = "https://dichvucong.binhduong.gov.vn/"
+    wordlist = ["cây cối", "sông hồ"] # có, có, ko có, ko có
+    driver = configure_chrome_driver()
+    num_links = 1
+    RELATED_URLS = "/Users/heliadinh/Desktop/scan_MC_project/scan_MC_files/urls/"
+
+    web_dict = findKeyword(driver, start_URL, wordlist, 1, num_links, RELATED_URLS)
+    
+    assert web_dict == {'STT': 1, 'Website': 'https://dichvucong.binhduong.gov.vn/', 'Keywords tìm thấy': "['dịch vụ', 'hành chính']", 'Link liên kết ngoài': 'Không', 'Người dùng đăng nhập': 'Không', 'Yêu cầu nạp tiền': 'Không'}
+
 

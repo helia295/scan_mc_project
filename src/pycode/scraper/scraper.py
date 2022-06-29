@@ -16,7 +16,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 ### Read data from CSV to get merchants' URLs
 def get_URLs_to_list(filename):
     url_list = []
-    file = open(filename)
+    file = open(filename, encoding="utf8")
     csvreader = csv.reader(file)
 
     next(csvreader)
@@ -181,7 +181,7 @@ def findKeyword(driver, website, wordlist, stt, num_links, related_urls):
                     if match != None:
                         print("Tìm thấy " + word + " trên " + website + " với context \"" + (str(soup))[(match.start()-5):(match.end()+5)] + "\";\n")
                         found.append(word)
-                        
+
                         # Check if Nap tien is required
                         if word == "nạp tiền":
                             nap_tien = True
