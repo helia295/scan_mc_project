@@ -76,7 +76,7 @@ def findKeyword(driver, website, wordlist, stt, num_links, related_urls):
     external_links = False
     user_login = False
     nap_tien = False
-
+    domain = ""
     if "https://" in website:
         domain = (website.replace("https://", "")).split("/")[0]
     elif "http://" in website:

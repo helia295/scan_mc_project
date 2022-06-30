@@ -46,7 +46,7 @@ app.layout = html.Div([
             style={
                 'fontFamily': "Times New Roman",
                 #'display':'inline-block',
-                'fontSize': '28',
+                'fontSize': 28,
                 'fontWeight': 'bold',
                 #"color": "#0059b3",
                 'display':'inline', 
@@ -65,18 +65,71 @@ app.layout = html.Div([
         'justifyContent': 'center',
     }),
     
-    html.H2("Bước 1: Upload 2 File Keywords (xls) & Merchants (csv)", 
+    html.H2("Bước 1: Chọn cách bạn muốn input (danh sách) websites cần scan.", 
         style = {
             'fontFamily': 'Times New Roman',
-            'fontSize': '21',
+            'fontSize': 21,
             'fontWeight': 'bold',
             'marginLeft': '30px',}
     ),
 
-    html.H4("Hãy upload file danh sách Keywords (định dạng xls) và file danh sách Merchants (định dạng csv)!",
+    html.H4("Lựa chọn giữa tải toàn bộ merchants cần scan lên dưới dạng file csv HOẶC nhập thủ công từng website để scan.",
             style = {
                 'fontFamily': 'Times New Roman',
-                'fontSize': '15',
+                'fontSize': 15,
+                'fontStyle': 'italic',
+                'textAlign': 'center',
+                'fontWeight': 'normal',}
+    ),
+
+    dcc.Dropdown(['Upload file CSV', 'Nhập url thủ công'], id='demo-dropdown',
+                style={
+                        "width": "100%",
+                        "height": "31px",
+                        "lineHeight": "31px",
+                        "textAlign": "center",
+                        "marginLeft": "5px",
+                        "fontFamily": "Times New Roman",
+                        "color": "gray",
+                        "fontSize": 15,
+                        'marginBottom': '15px', 
+                    },
+    ),
+    html.Div(id='dd-output-container',
+            style = {
+                'fontFamily': 'Times New Roman',
+                'fontSize': 15,
+                'fontStyle': 'italic',
+                'textAlign': 'center',
+                'fontWeight': 'normal',
+                'color': 'blue',
+                'marginBottom': '20px',
+                'persistence': 'False'}
+    ),
+
+    html.Div([
+        dcc.Input(
+                id="mc_input",
+                type="url",
+                placeholder="Nhập url vào đây.",
+                debounce=True,
+                #required = "required",
+                )
+        ], style= {}
+    ),
+    
+    html.H2("Bước 2: Upload File(s).", 
+        style = {
+            'fontFamily': 'Times New Roman',
+            'fontSize': 21,
+            'fontWeight': 'bold',
+            'marginLeft': '30px',}
+    ),
+
+    html.H4("Hãy upload file danh sách Keywords (định dạng xls) và file danh sách Merchants (định dạng csv) - nếu có!",
+            style = {
+                'fontFamily': 'Times New Roman',
+                'fontSize': 15,
                 'fontStyle': 'italic',
                 'textAlign': 'center',
                 'fontWeight': 'normal',}
@@ -85,7 +138,7 @@ app.layout = html.Div([
     dcc.Upload(
         id="upload-data",
         children=html.Div(
-            ["Drag and drop or click to select a file to upload."]
+            ["Kéo thả hoặc Bấm vào đây để chọn file tải lên."]
         ),
         style={
             "width": "100%",
@@ -98,7 +151,7 @@ app.layout = html.Div([
             "marginLeft": "10px",
             "fontFamily": "Times New Roman",
             "color": "gray",
-            "fontSize": "15",
+            "fontSize": 15,
         },
         multiple=True,
     ),
@@ -106,7 +159,7 @@ app.layout = html.Div([
     html.H3("Danh sách File đã tải lên:",
             style = {
                 'fontFamily': 'Times New Roman',
-                'fontSize': '18',
+                'fontSize': 18,
                 'fontWeight': 'bold',
                 'marginLeft': '30px',
                 'marginTop': '20px',
@@ -119,7 +172,7 @@ app.layout = html.Div([
                 'marginLeft': '45px',}
     ),
 
-    html.H2("Bước 2: Nhập số lượng link để scan cho mỗi Merchant",
+    html.H2("Bước 3: Nhập số lượng link để scan cho mỗi Merchant.",
             style = {
                 'fontFamily': 'Times New Roman',
                 'fontSize': 21,
@@ -150,7 +203,7 @@ app.layout = html.Div([
             #required = "required",
     ),
 
-    html.H2("Bước 3: Bấm nút chạy lấy Kết quả",
+    html.H2("Bước 4: Bấm nút chạy lấy Kết quả.",
             style = {
                 'fontFamily': 'Times New Roman',
                 'fontSize': 21,
@@ -170,7 +223,7 @@ app.layout = html.Div([
                         'borderColor': '#004d99',
                         'textAlign': 'center',
                         'fontFamily': 'Times New Roman',
-                        'fontSize': 18,
+                        'fontSize': 17,
                         'display': 'block',
                         'marginLeft': 'auto',
                         'marginRight': 'auto',
@@ -247,7 +300,7 @@ app.layout = html.Div([
                         'backgroundColor': '#66b3ff',
                         'color': 'black',
                         'fontWeight': 'bold',
-                        'fontSize': 16,
+                        'fontSize': 15,
                         'fontFamily':'Times New Roman',
                         'textAlign': 'center',
                     }
@@ -290,6 +343,30 @@ def file_download_link(filename):
 
 
 @app.callback(
+    [Output('dd-output-container', 'children'), Output('mc_input', 'style')],
+    Input('demo-dropdown', 'value')
+)
+def update_output(value):
+    if value == "Upload file CSV":
+        return [f'Bạn đã chọn {value}. Xin mời thực hiện ở Bước 2!',
+                {'display': 'none',}]
+    elif value == "Nhập url thủ công":
+        return [f'Bạn đã chọn {value}. Xin mời nhập link website của 1 Merchant cần scan ở ô dưới đây!', 
+                {'display': 'inline',
+                'textAlign': 'center',
+                'fontSize': 15,
+                'marginLeft':'10px',
+                'height': '31px', 
+                'width': '100%',
+                'marginBottom': '5px', 
+                'fontFamily': 'Times New Roman',
+                'color': 'gray',
+                }]
+    else:
+        return [None,{'display': 'none'}]
+
+
+@app.callback(
     Output("file-list", "children"),
     [Input("upload-data", "filename"), Input("upload-data", "contents")],)
 def update_output(uploaded_filenames, uploaded_file_contents):
@@ -307,17 +384,20 @@ def update_output(uploaded_filenames, uploaded_file_contents):
 
 @app.callback(
     [Output('button-validation', 'children'), Output('run', 'n_clicks')], 
-    [Input('run', 'n_clicks'),Input('num_links', 'value') ])
-def button_validation(n_clicks, num_links):
+    [Input('run', 'n_clicks'),Input('num_links', 'value'),
+    Input('demo-dropdown', 'value'), Input('mc_input', 'value')])
+def button_validation(n_clicks, num_links, method, url):
     changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
     if ("run" in changed_id):
         if n_clicks > 0:
             files = uploaded_files()
-            if len(files) < 2:
-                return ["Hãy upload đủ 2 files Keywords và Merchants ở Bước 1!", 0]
+            if (method == "Nhập url thủ công") and ((url == None) or (url == "")):
+                return ["Hãy nhập chính xác link website của Merchant cần scan ở Bước 1!", 0]
+            if (method == "Upload file CSV") and (len(files) < 2):
+                return ["Hãy upload đủ 2 files Keywords và Merchants ở Bước 2!", 0]
             if (num_links == None) or (num_links < 1):
-                return ["Hãy nhập số lớn hơn hoặc bằng 1 và không bao gồm các chữ cái ở Bước 2!", 0]
-            if num_links != None:
+                return ["Hãy nhập số lớn hơn hoặc bằng 1 và không bao gồm các chữ cái ở Bước 3!", 0]
+            if (num_links != None):
                 return [None, 1]
         else:
             return [None, 0]
@@ -327,12 +407,12 @@ def button_validation(n_clicks, num_links):
 
 @app.callback(
     [Output("table-container", "data"), Output("button-running", "children")],
-    [Input("upload-data", "filename"), Input("upload-data", "contents"), Input("num_links", "value"), Input("run", "n_clicks")],)
-def generate_table(uploaded_filenames, uploaded_file_contents, value, n_clicks):
-        dict_list = []
-        print(n_clicks)
-    #changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
-    #if ("run" in changed_id):
+    [Input("upload-data", "filename"), Input("upload-data", "contents"), 
+    Input("num_links", "value"), Input("run", "n_clicks"),
+    Input('demo-dropdown', 'value'), Input('mc_input', 'value')],)
+def generate_table(uploaded_filenames, uploaded_file_contents, value, n_clicks, method, url):
+    dict_list = []
+    if method == "Upload file CSV":
         if (n_clicks != None) and (n_clicks > 0):
             from src.pycode.scraper.scraper import get_URLs_to_list, getKeywordstoList, configure_chrome_driver, findKeyword
             
@@ -352,8 +432,39 @@ def generate_table(uploaded_filenames, uploaded_file_contents, value, n_clicks):
 
             driver = configure_chrome_driver()
             
-            stt = 0
+            stt = 1
             for web in start_URLs[0:5]:
+                web_dict = findKeyword(driver, web, wordlist, stt, value, RELATED_URLS)
+                if web_dict != {}:
+                    #print(web_dict)
+                    dict_list.append(web_dict)
+                    stt+=1
+            
+            return [dict_list, "Đã scan xong!"]
+
+        else:
+            a = pd.read_csv(SAMPLE_FILE)
+            return [a.to_dict("records"), None]
+    else:
+        if (n_clicks != None) and (n_clicks > 0):
+            from src.pycode.scraper.scraper import get_URLs_to_list, getKeywordstoList, configure_chrome_driver, findKeyword
+            
+            for filename in os.listdir(UPLOAD_DIRECTORY):
+                path = os.path.join(UPLOAD_DIRECTORY, filename)
+                if os.path.isfile(path):
+                    if "xls" in str(path):
+                        xlsfile = path
+            
+            # Get a list of start URLs to scan
+            start_URLs = [url]
+
+            # Get a list of keywords to scan
+            wordlist = getKeywordstoList(xlsfile)
+
+            driver = configure_chrome_driver()
+            
+            stt = 1
+            for web in start_URLs:
                 web_dict = findKeyword(driver, web, wordlist, stt, value, RELATED_URLS)
                 if web_dict != {}:
                     #print(web_dict)

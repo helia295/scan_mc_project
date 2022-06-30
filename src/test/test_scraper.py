@@ -8,18 +8,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 
 
-'''
-case 1: website url chua https
-case 2: ---------------- http
-
-case 1: word trong wordlist co trong found
-case 2: ------------------- ko co trong found
-
-case 1: website trong url
-case 2: webbsite ko co trong url
-
-'''
-
 def test_get_URLs_to_list_length():
     mc_file = "/Users/heliadinh/Desktop/DS Terminal CTT.csv"
     start_URLs = get_URLs_to_list(mc_file)
@@ -124,6 +112,7 @@ def test_findKeyword_wordlist_avail():
     web_dict = findKeyword(driver, start_URL, wordlist, 1, num_links, RELATED_URLS)
     
     assert web_dict == {'STT': 1, 'Website': 'https://johnhenry.vn/', 'Keywords tìm thấy': "['thiết kế', 'sơ mi']", 'Link liên kết ngoài': 'Không', 'Người dùng đăng nhập': 'Có', 'Yêu cầu nạp tiền': 'Có'}
+
 
 @pytest.mark.dependency(depends=["test_configure_chrome_driver"])
 def test_findKeyword_wordlist_unavail():
