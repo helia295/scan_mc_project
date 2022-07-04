@@ -65,7 +65,7 @@ app.layout = html.Div([
         'justifyContent': 'center',
     }),
     
-    html.H2("Bước 1: Chọn cách bạn muốn input (danh sách) websites cần scan.", 
+    html.H2("Bước 1: Chọn cách input website(s) cần scan.", 
         style = {
             'fontFamily': 'Times New Roman',
             'fontSize': 21,
@@ -73,7 +73,7 @@ app.layout = html.Div([
             'marginLeft': '30px',}
     ),
 
-    html.H4("Lựa chọn giữa tải toàn bộ merchants cần scan lên dưới dạng file csv HOẶC nhập thủ công từng website để scan.",
+    html.H4("Lựa chọn giữa upload toàn bộ merchants cần scan lên dưới dạng file csv HOẶC nhập thủ công từng website để scan.",
             style = {
                 'fontFamily': 'Times New Roman',
                 'fontSize': 15,
@@ -126,7 +126,7 @@ app.layout = html.Div([
             'marginLeft': '30px',}
     ),
 
-    html.H4("Hãy upload file danh sách Keywords (định dạng xls) và file danh sách Merchants (định dạng csv) - nếu có!",
+    html.H4(id="upload-prompt", 
             style = {
                 'fontFamily': 'Times New Roman',
                 'fontSize': 15,
@@ -138,7 +138,7 @@ app.layout = html.Div([
     dcc.Upload(
         id="upload-data",
         children=html.Div(
-            ["Kéo thả hoặc Bấm vào đây để chọn file tải lên."]
+            ["Kéo thả hoặc Bấm vào đây để chọn file(s) cần upload."]
         ),
         style={
             "width": "100%",
@@ -367,9 +367,20 @@ def update_output(value):
 
 
 @app.callback(
+    Output('upload-prompt', 'children'),
+    Input('demo-dropdown', 'value')
+)
+def update_prompt(value):
+    if value == "Nhập url thủ công":
+        return "Hãy upload file danh sách Keywords (định dạng xls) ở đây!"
+    else:
+        return "Hãy upload file danh sách Keywords (định dạng xls) và file danh sách Merchants (định dạng csv) ở đây!"
+
+
+@app.callback(
     Output("file-list", "children"),
-    [Input("upload-data", "filename"), Input("upload-data", "contents")],)
-def update_output(uploaded_filenames, uploaded_file_contents):
+    [Input("upload-data", "filename"), Input("upload-data", "contents"), Input("run", "n_clicks")],)
+def update_file_list(uploaded_filenames, uploaded_file_contents, n_clicks):
     """Save uploaded files and regenerate the file list."""
     if uploaded_filenames is not None and uploaded_file_contents is not None:
         for name, data in zip(uploaded_filenames, uploaded_file_contents):
@@ -384,7 +395,7 @@ def update_output(uploaded_filenames, uploaded_file_contents):
 
 @app.callback(
     [Output('button-validation', 'children'), Output('run', 'n_clicks')], 
-    [Input('run', 'n_clicks'),Input('num_links', 'value'),
+    [Input('run', 'n_clicks'), Input('num_links', 'value'),
     Input('demo-dropdown', 'value'), Input('mc_input', 'value')])
 def button_validation(n_clicks, num_links, method, url):
     changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
@@ -406,7 +417,8 @@ def button_validation(n_clicks, num_links, method, url):
         
 
 @app.callback(
-    [Output("table-container", "data"), Output("button-running", "children")],
+    [Output("table-container", "data"), Output("button-running", "children"), 
+    Output("upload-data", "filename"), Output("upload-data", "contents")],
     [Input("upload-data", "filename"), Input("upload-data", "contents"), 
     Input("num_links", "value"), Input("run", "n_clicks"),
     Input('demo-dropdown', 'value'), Input('mc_input', 'value')],)
@@ -426,9 +438,11 @@ def generate_table(uploaded_filenames, uploaded_file_contents, value, n_clicks, 
             
             # Get a list of start URLs to scan
             start_URLs = get_URLs_to_list(mc_file)
+            os.remove(mc_file)
 
             # Get a list of keywords to scan
             wordlist = getKeywordstoList(xlsfile)
+            os.remove(xlsfile)
 
             driver = configure_chrome_driver()
             
@@ -439,12 +453,11 @@ def generate_table(uploaded_filenames, uploaded_file_contents, value, n_clicks, 
                     #print(web_dict)
                     dict_list.append(web_dict)
                     stt+=1
-            
-            return [dict_list, "Đã scan xong!"]
+            return [dict_list, "Đã scan xong!", None, None]
 
         else:
             a = pd.read_csv(SAMPLE_FILE)
-            return [a.to_dict("records"), None]
+            return [a.to_dict("records"), None, uploaded_filenames, uploaded_file_contents]
     else:
         if (n_clicks != None) and (n_clicks > 0):
             from src.pycode.scraper.scraper import get_URLs_to_list, getKeywordstoList, configure_chrome_driver, findKeyword
@@ -460,6 +473,7 @@ def generate_table(uploaded_filenames, uploaded_file_contents, value, n_clicks, 
 
             # Get a list of keywords to scan
             wordlist = getKeywordstoList(xlsfile)
+            os.remove(xlsfile)
 
             driver = configure_chrome_driver()
             
@@ -471,11 +485,11 @@ def generate_table(uploaded_filenames, uploaded_file_contents, value, n_clicks, 
                     dict_list.append(web_dict)
                     stt+=1
             
-            return [dict_list, "Đã scan xong!"]
+            return [dict_list, "Đã scan xong!", None, None]
 
         else:
             a = pd.read_csv(SAMPLE_FILE)
-            return [a.to_dict("records"), None]
+            return [a.to_dict("records"), None, uploaded_filenames, uploaded_file_contents]
 
 '''
 if __name__ == '__main__':
