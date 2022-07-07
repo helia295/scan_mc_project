@@ -440,7 +440,6 @@ def button_validation(n_clicks, num_links, method, url):
     ],
 )
 def generate_table(uploaded_filenames, uploaded_file_contents, value, n_clicks, method, url):
-    dict_list = []
     if method == "Upload file CSV":
         if (n_clicks != None) and (n_clicks > 0):
             
