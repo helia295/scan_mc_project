@@ -1,10 +1,11 @@
 # Run this app with `python app.py` and
 # visit http://127.0.0.1:8050/ in your web browser.
 
+
 from turtle import update
 from dash import Dash, html, dash_table, dcc
 import pandas as pd
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import base64
 import os
 from urllib.parse import quote as urlquote
@@ -19,6 +20,7 @@ config = dotenv_values("./.env")
 UPLOAD_DIRECTORY = config['UPLOAD_DIRECTORY']
 SAMPLE_FILE = config['SAMPLE_FILE']
 RELATED_URLS = config['RELATED_URLS']
+RESULT_CSV = config['RESULT_CSV']
 LOGO_PATH = "./assets/logo.png"
 
 encoded_image = base64.b64encode(open(LOGO_PATH, 'rb').read())
@@ -62,8 +64,8 @@ app.layout = html.Div([
         'display': 'flex',
         'textAlign': 'center',
         'alignItem': 'center',
-        'justifyContent': 'center',
-    }),
+        'justifyContent': 'center',}
+    ),
     
     html.H2("Bước 1: Chọn cách input website(s) cần scan.", 
         style = {
@@ -243,6 +245,7 @@ app.layout = html.Div([
                 'persistence': 'False'}
     ),
 
+    html.Div([
     html.Div(id = "button-running", 
             style = {
                 'fontFamily': 'Times New Roman',
@@ -254,6 +257,7 @@ app.layout = html.Div([
                 'marginBottom': '20px',
                 'persistence': 'False'}
     ),
+
     dcc.Loading(
             id="loading-table",
             type="circle",
@@ -308,9 +312,16 @@ app.layout = html.Div([
             ),
         style = {
             'position': 'absolute',
-            'marginBottom': '700px',
+            'marginTop': '30px',
         }
     ),
+    dcc.Interval(
+        id='interval-component',
+        interval=45*1000, # in milliseconds
+        n_intervals=0
+    ),
+    ]),
+    
 ], style = {
     'marginRight': '40px',
     'marginLeft': '25px',
@@ -402,9 +413,13 @@ def button_validation(n_clicks, num_links, method, url):
     if ("run" in changed_id):
         if n_clicks > 0:
             files = uploaded_files()
+            if method == None:
+                return ["Hãy chọn phương pháp upload danh sách MC ở Bước 1!", 0]
             if (method == "Nhập url thủ công") and ((url == None) or (url == "")):
                 return ["Hãy nhập chính xác link website của Merchant cần scan ở Bước 1!", 0]
-            if (method == "Upload file CSV") and (len(files) < 2):
+            if (method == "Nhập url thủ công") and ((len(files) < 1) or ("xls" not in files[0])):
+                return ["Hãy upload file Keywords (định dạng xls) ở Bước 2!", 0]
+            if (method == "Upload file CSV") and ((len(files) < 2) or (len(files) == 0)):
                 return ["Hãy upload đủ 2 files Keywords và Merchants ở Bước 2!", 0]
             if (num_links == None) or (num_links < 1):
                 return ["Hãy nhập số lớn hơn hoặc bằng 1 và không bao gồm các chữ cái ở Bước 3!", 0]
@@ -417,16 +432,17 @@ def button_validation(n_clicks, num_links, method, url):
         
 
 @app.callback(
-    [Output("table-container", "data"), Output("button-running", "children"), 
-    Output("upload-data", "filename"), Output("upload-data", "contents")],
+    [Output("upload-data", "filename"), Output("upload-data", "contents"),
+    ],
     [Input("upload-data", "filename"), Input("upload-data", "contents"), 
     Input("num_links", "value"), Input("run", "n_clicks"),
-    Input('demo-dropdown', 'value'), Input('mc_input', 'value')],)
+    Input('demo-dropdown', 'value'), Input('mc_input', 'value'),
+    ],
+)
 def generate_table(uploaded_filenames, uploaded_file_contents, value, n_clicks, method, url):
     dict_list = []
     if method == "Upload file CSV":
         if (n_clicks != None) and (n_clicks > 0):
-            from src.pycode.scraper.scraper import get_URLs_to_list, getKeywordstoList, configure_chrome_driver, findKeyword
             
             for filename in os.listdir(UPLOAD_DIRECTORY):
                 path = os.path.join(UPLOAD_DIRECTORY, filename)
@@ -436,31 +452,14 @@ def generate_table(uploaded_filenames, uploaded_file_contents, value, n_clicks, 
                     elif "xls" in str(path):
                         xlsfile = path
             
-            # Get a list of start URLs to scan
-            start_URLs = get_URLs_to_list(mc_file)
-            os.remove(mc_file)
-
-            # Get a list of keywords to scan
-            wordlist = getKeywordstoList(xlsfile)
-            os.remove(xlsfile)
-
-            driver = configure_chrome_driver()
+            os.system('python3 run_scraper.py '+ mc_file + ' ' + xlsfile + ' ' + str(value) + ' ' + RELATED_URLS)
             
-            stt = 1
-            for web in start_URLs[0:5]:
-                web_dict = findKeyword(driver, web, wordlist, stt, value, RELATED_URLS)
-                if web_dict != {}:
-                    #print(web_dict)
-                    dict_list.append(web_dict)
-                    stt+=1
-            return [dict_list, "Đã scan xong!", None, None]
+            return [ None, None]
 
         else:
-            a = pd.read_csv(SAMPLE_FILE)
-            return [a.to_dict("records"), None, uploaded_filenames, uploaded_file_contents]
+            return [uploaded_filenames, uploaded_file_contents]
     else:
         if (n_clicks != None) and (n_clicks > 0):
-            from src.pycode.scraper.scraper import get_URLs_to_list, getKeywordstoList, configure_chrome_driver, findKeyword
             
             for filename in os.listdir(UPLOAD_DIRECTORY):
                 path = os.path.join(UPLOAD_DIRECTORY, filename)
@@ -468,28 +467,36 @@ def generate_table(uploaded_filenames, uploaded_file_contents, value, n_clicks, 
                     if "xls" in str(path):
                         xlsfile = path
             
-            # Get a list of start URLs to scan
-            start_URLs = [url]
-
-            # Get a list of keywords to scan
-            wordlist = getKeywordstoList(xlsfile)
-            os.remove(xlsfile)
-
-            driver = configure_chrome_driver()
+            os.system('python3 run_scraper.py '+ url + ' ' + xlsfile + ' ' + str(value) + ' ' + RELATED_URLS)
             
-            stt = 1
-            for web in start_URLs:
-                web_dict = findKeyword(driver, web, wordlist, stt, value, RELATED_URLS)
-                if web_dict != {}:
-                    #print(web_dict)
-                    dict_list.append(web_dict)
-                    stt+=1
-            
-            return [dict_list, "Đã scan xong!", None, None]
+            return [ None, None]
 
         else:
+            return [ uploaded_filenames, uploaded_file_contents]
+
+@app.callback(
+    [Output("table-container", "data"), Output("button-running", "children")],
+    [Input('interval-component', 'n_intervals'), Input("run", "n_clicks")]
+    
+)
+def show_result(n_intervals, n_clicks):
+    if n_intervals >= 0:
+        if (n_clicks != None) and (n_clicks > 0):
+            time.sleep(2)
+            res = pd.read_csv(RESULT_CSV)
+            try: 
+                current = res.to_dict("records")[-1]["STT"]
+                return [res.to_dict("records"), "Đã scan xong "+str(current)+ " merchant(s)."]
+            except:
+                return [res.to_dict("records"), "Đang scan..."]
+        else:
             a = pd.read_csv(SAMPLE_FILE)
-            return [a.to_dict("records"), None, uploaded_filenames, uploaded_file_contents]
+            return [a.to_dict("records"), "Xin mời tham khảo sample!"]
+    else:
+        a = pd.read_csv(SAMPLE_FILE)
+        return [a.to_dict("records"), "Xin mời tham khảo sample!"]
+
+    
 
 '''
 if __name__ == '__main__':

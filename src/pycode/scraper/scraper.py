@@ -9,6 +9,7 @@ import csv
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+import threading
 
 #MAX_LINKS = 5     # max follow links per merchant
 #DRIVER_PATH="./config/chromedriver"
@@ -54,6 +55,8 @@ def get_all_links_on_URL(driver, num_links):
     return url_list
 
 
+threadLocal = threading.local()
+
 # configure Chrome Webdriver
 def configure_chrome_driver():
     
@@ -94,10 +97,10 @@ def findKeyword(driver, website, wordlist, stt, num_links, related_urls):
     except:
         print("Không reach được website " + website + "\n")
         f.write("Không reach được website " + website + "\n")
-        web_dict["Keywords tìm thấy"] = '["N/A"]'
-        web_dict["Link liên kết ngoài"] = "N/A"
-        web_dict["Người dùng đăng nhập"] = "N/A"
-        web_dict["Yêu cầu nạp tiền"] = "N/A"
+        web_dict["Keywords tìm thấy"] = "'N/A'"
+        web_dict["Link liên kết ngoài"] = "'N/A'"
+        web_dict["Người dùng đăng nhập"] = "'N/A'"
+        web_dict["Yêu cầu nạp tiền"] = "'N/A'"
 
         return web_dict
 
