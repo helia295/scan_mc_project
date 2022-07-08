@@ -21,6 +21,7 @@ UPLOAD_DIRECTORY = config['UPLOAD_DIRECTORY']
 SAMPLE_FILE = config['SAMPLE_FILE']
 RELATED_URLS = config['RELATED_URLS']
 RESULT_CSV = config['RESULT_CSV']
+INTERVAL_MS = int(config['INTERVAL_MS'])
 LOGO_PATH = "./assets/logo.png"
 
 encoded_image = base64.b64encode(open(LOGO_PATH, 'rb').read())
@@ -47,7 +48,6 @@ app.layout = html.Div([
             children='CÔNG CỤ SCAN WEBSITE CỦA MERCHANT',
             style={
                 'fontFamily': "Times New Roman",
-                #'display':'inline-block',
                 'fontSize': 28,
                 'fontWeight': 'bold',
                 #"color": "#0059b3",
@@ -264,7 +264,7 @@ app.layout = html.Div([
             children=html.Div(id='result-table', 
                     children=[dash_table.DataTable(
                     id="table-container",
-                    columns=[{'name': 'STT', 'id': 'STT'},
+                    columns=[
                             {'name': 'Website', 'id': 'Website'},
                             {'name': 'Keywords tìm thấy', 'id': 'Keywords tìm thấy'},
                             {'name': 'Link liên kết ngoài', 'id': 'Link liên kết ngoài'},
@@ -281,7 +281,7 @@ app.layout = html.Div([
                         {
                             'if': {'column_id': d},
                             'textAlign': 'center',
-                        } for d in ["STT", "Link liên kết ngoài", "Người dùng đăng nhập", "Yêu cầu nạp tiền"]
+                        } for d in ["Link liên kết ngoài", "Người dùng đăng nhập", "Yêu cầu nạp tiền"]
                     ],
                     style_cell={
                         'height': 'auto',
@@ -317,7 +317,7 @@ app.layout = html.Div([
     ),
     dcc.Interval(
         id='interval-component',
-        interval=45*1000, # in milliseconds
+        interval= INTERVAL_MS, # in milliseconds
         n_intervals=0
     ),
     ]),
@@ -432,12 +432,10 @@ def button_validation(n_clicks, num_links, method, url):
         
 
 @app.callback(
-    [Output("upload-data", "filename"), Output("upload-data", "contents"),
-    ],
+    [Output("upload-data", "filename"), Output("upload-data", "contents"),],
     [Input("upload-data", "filename"), Input("upload-data", "contents"), 
     Input("num_links", "value"), Input("run", "n_clicks"),
-    Input('demo-dropdown', 'value'), Input('mc_input', 'value'),
-    ],
+    Input('demo-dropdown', 'value'), Input('mc_input', 'value'),],
 )
 def generate_table(uploaded_filenames, uploaded_file_contents, value, n_clicks, method, url):
     if method == "Upload file CSV":
@@ -473,20 +471,24 @@ def generate_table(uploaded_filenames, uploaded_file_contents, value, n_clicks, 
         else:
             return [ uploaded_filenames, uploaded_file_contents]
 
+
 @app.callback(
     [Output("table-container", "data"), Output("button-running", "children")],
     [Input('interval-component', 'n_intervals'), Input("run", "n_clicks")]
-    
 )
 def show_result(n_intervals, n_clicks):
     if n_intervals >= 0:
-        if (n_clicks != None) and (n_clicks > 0):
-            time.sleep(2)
-            res = pd.read_csv(RESULT_CSV)
-            try: 
-                current = res.to_dict("records")[-1]["STT"]
-                return [res.to_dict("records"), "Đã scan xong "+str(current)+ " merchant(s)."]
+        if n_clicks > 0:
+            try:
+                res = pd.read_csv(RESULT_CSV)
             except:
+                time.sleep(1)
+                res = pd.read_csv(RESULT_CSV)
+
+            count = len(res.to_dict("records"))
+            if count > 0:
+                return [res.to_dict("records"), "Đã scan xong "+str(count)+ " merchant(s)."]
+            else:
                 return [res.to_dict("records"), "Đang scan..."]
         else:
             a = pd.read_csv(SAMPLE_FILE)
@@ -494,8 +496,6 @@ def show_result(n_intervals, n_clicks):
     else:
         a = pd.read_csv(SAMPLE_FILE)
         return [a.to_dict("records"), "Xin mời tham khảo sample!"]
-
-    
 
 '''
 if __name__ == '__main__':

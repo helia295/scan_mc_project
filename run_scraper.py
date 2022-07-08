@@ -2,13 +2,16 @@ import os
 import sys
 from tracemalloc import start
 import csv
+from multiprocessing.pool import ThreadPool
+import itertools
 
 from dotenv import dotenv_values
 
 config = dotenv_values("./.env")
 RESULT_CSV = config['RESULT_CSV']
+THREADS_COUNT = int(config['THREADS_COUNT'])
 
-from src.pycode.scraper.scraper import get_URLs_to_list, getKeywordstoList, configure_chrome_driver, findKeyword
+from src.pycode.scraper.scraper import get_URLs_to_list, getKeywordstoList, findKeyword
 
 def main():     
     
@@ -17,8 +20,6 @@ def main():
     value = sys.argv[3]
     RELATED_URLS = sys.argv[4]
     
-
-    #dict_list = []
     # Get a list of start URLs to scan
     if "csv" in mc_file: 
         start_URLs = get_URLs_to_list(mc_file)
@@ -27,7 +28,7 @@ def main():
         start_URLs = [mc_file]
 
     f = open(RESULT_CSV, 'w')
-    headers = ["STT", "Website", "Keywords tìm thấy", "Link liên kết ngoài", "Người dùng đăng nhập", "Yêu cầu nạp tiền"]
+    headers = ["Website", "Keywords tìm thấy", "Link liên kết ngoài", "Người dùng đăng nhập", "Yêu cầu nạp tiền"]
     writer = csv.DictWriter(f, fieldnames = headers)
     writer.writeheader()
     f.flush()
@@ -36,16 +37,12 @@ def main():
     wordlist = getKeywordstoList(xlsfile)
     os.remove(xlsfile)
 
-    driver = configure_chrome_driver()
-    
-    stt = 1
-    for web in start_URLs:
-        web_dict = findKeyword(driver, web, wordlist, stt, int(value), RELATED_URLS)
-        #dict_list.append(web_dict)
-        
-        writer.writerow(web_dict)
-        f.flush()
-        stt+=1
+    with ThreadPool(THREADS_COUNT) as pool:
+        res = list(pool.starmap(findKeyword, [*zip(start_URLs, itertools.repeat(wordlist), itertools.repeat(int(value)), itertools.repeat(RELATED_URLS), itertools.repeat(writer), itertools.repeat(f))]))
+        # must be done before terminate is explicitly or implicitly called on the pool:
+        del threadLocal
+
+    pool.terminate()
 
     f.close()
 

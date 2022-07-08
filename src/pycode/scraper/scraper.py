@@ -11,6 +11,7 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import threading
 
+
 #MAX_LINKS = 5     # max follow links per merchant
 #DRIVER_PATH="./config/chromedriver"
 
@@ -55,26 +56,38 @@ def get_all_links_on_URL(driver, num_links):
     return url_list
 
 
+class Driver:
+    def __init__(self):
+        # Add additional Options to the webdriver
+        options = Options()
+        
+        # add the argument and make the browser Headless.
+        options.add_argument("--headless")
+        options.add_argument('--no-sandbox')
+        options.add_experimental_option('excludeSwitches', ['enable-logging'])
+
+        # Instantiate the Webdriver: Mention the executable path of the webdriver you have downloaded
+        # if driver is in PATH, no need to provide executable_path
+        self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+
+
+    def __del__(self):
+        self.driver.quit() # clean up driver when we are cleaned up
+        print('The driver has terminated.')
+
+
 threadLocal = threading.local()
 
-# configure Chrome Webdriver
+
 def configure_chrome_driver():
-    
-    # Add additional Options to the webdriver
-    options = Options()
-    
-    # add the argument and make the browser Headless.
-    options.add_argument("--headless")
-    options.add_argument('--no-sandbox')
-
-    # Instantiate the Webdriver: Mention the executable path of the webdriver you have downloaded
-    # if driver is in PATH, no need to provide executable_path
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-    
-    return driver
+    the_driver = getattr(threadLocal, 'the_driver', None)
+    if the_driver is None:
+        the_driver = Driver()
+        setattr(threadLocal, 'the_driver', the_driver)
+    return the_driver.driver
 
 
-def findKeyword(driver, website, wordlist, stt, num_links, related_urls):
+def findKeyword(website, wordlist, num_links, related_urls, writer, result_file):
     
     external_links = False
     user_login = False
@@ -89,9 +102,9 @@ def findKeyword(driver, website, wordlist, stt, num_links, related_urls):
     f = open(f"{related_urls}{domain}.csv", 'w')
 
     web_dict = {}
-    web_dict["STT"] = stt
     web_dict["Website"] = website
 
+    driver = configure_chrome_driver()
     try:
         driver.get(website)
     except:
@@ -101,6 +114,9 @@ def findKeyword(driver, website, wordlist, stt, num_links, related_urls):
         web_dict["Link liên kết ngoài"] = "'N/A'"
         web_dict["Người dùng đăng nhập"] = "'N/A'"
         web_dict["Yêu cầu nạp tiền"] = "'N/A'"
+
+        writer.writerow(web_dict)
+        result_file.flush()
 
         return web_dict
 
@@ -224,6 +240,9 @@ def findKeyword(driver, website, wordlist, stt, num_links, related_urls):
         web_dict["Yêu cầu nạp tiền"] = "Có"
     else:
         web_dict["Yêu cầu nạp tiền"] = "Không"
+
+    writer.writerow(web_dict)
+    result_file.flush()
 
     return web_dict
         
