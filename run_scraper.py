@@ -4,6 +4,7 @@ from tracemalloc import start
 import csv
 from multiprocessing.pool import ThreadPool
 import itertools
+import threading
 
 from dotenv import dotenv_values
 
@@ -14,7 +15,7 @@ THREADS_COUNT = int(config['THREADS_COUNT'])
 from src.pycode.scraper.scraper import get_URLs_to_list, getKeywordstoList, findKeyword
 
 def main():     
-    
+
     mc_file = sys.argv[1]
     xlsfile = sys.argv[2]
     value = sys.argv[3]
@@ -27,7 +28,7 @@ def main():
     else:
         start_URLs = [mc_file]
 
-    f = open(RESULT_CSV, 'w')
+    f = open(RESULT_CSV, 'w', encoding="utf8")
     headers = ["Website", "Keywords tìm thấy", "Link liên kết ngoài", "Người dùng đăng nhập", "Yêu cầu nạp tiền"]
     writer = csv.DictWriter(f, fieldnames = headers)
     writer.writeheader()
@@ -37,8 +38,10 @@ def main():
     wordlist = getKeywordstoList(xlsfile)
     os.remove(xlsfile)
 
+    threadLocal = threading.local()
+
     with ThreadPool(THREADS_COUNT) as pool:
-        res = list(pool.starmap(findKeyword, [*zip(start_URLs, itertools.repeat(wordlist), itertools.repeat(int(value)), itertools.repeat(RELATED_URLS), itertools.repeat(writer), itertools.repeat(f))]))
+        res = list(pool.starmap(findKeyword, [*zip(start_URLs, itertools.repeat(wordlist), itertools.repeat(int(value)), itertools.repeat(RELATED_URLS), itertools.repeat(writer), itertools.repeat(f), itertools.repeat(threadLocal))]))
         # must be done before terminate is explicitly or implicitly called on the pool:
         del threadLocal
 

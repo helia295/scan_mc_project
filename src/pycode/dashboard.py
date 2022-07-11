@@ -28,7 +28,6 @@ encoded_image = base64.b64encode(open(LOGO_PATH, 'rb').read())
 
 df = pd.read_csv(SAMPLE_FILE)
 
-
 # Normally, Dash creates its own Flask server internally. By creating our own,
 # we can create a route for downloading files directly:
 server = Flask(__name__)
@@ -246,80 +245,80 @@ app.layout = html.Div([
     ),
 
     html.Div([
-    html.Div(id = "button-running", 
-            style = {
-                'fontFamily': 'Times New Roman',
-                'fontSize': 15,
-                'fontStyle': 'italic',
-                'textAlign': 'center',
-                'fontWeight': 'normal',
-                'color': "blue",
-                'marginBottom': '20px',
-                'persistence': 'False'}
-    ),
+        html.Div(id = "button-running", 
+                style = {
+                    'fontFamily': 'Times New Roman',
+                    'fontSize': 15,
+                    'fontStyle': 'italic',
+                    'textAlign': 'center',
+                    'fontWeight': 'normal',
+                    'color': "blue",
+                    'marginBottom': '20px',
+                    'persistence': 'False'}
+        ),
 
-    dcc.Loading(
-            id="loading-table",
-            type="circle",
-            children=html.Div(id='result-table', 
-                    children=[dash_table.DataTable(
-                    id="table-container",
-                    columns=[
-                            {'name': 'Website', 'id': 'Website'},
-                            {'name': 'Keywords tìm thấy', 'id': 'Keywords tìm thấy'},
-                            {'name': 'Link liên kết ngoài', 'id': 'Link liên kết ngoài'},
-                            {'name': 'Người dùng đăng nhập', 'id': 'Người dùng đăng nhập'},
-                            {'name': 'Yêu cầu nạp tiền', 'id': 'Yêu cầu nạp tiền'}],
-                    data=df.to_dict("records"),
-                    style_table = {"marginLeft": "10px","marginRight": "50px",},
-                    style_cell_conditional=[
-                        {
-                            'if': {'column_id': c},
-                            'textAlign': 'left',
-                        } for c in ["Website", "Keywords tìm thấy"]
-                    ] + [
-                        {
-                            'if': {'column_id': d},
+        dcc.Loading(
+                id="loading-table",
+                type="circle",
+                children=html.Div(id='result-table', 
+                        children=[dash_table.DataTable(
+                        id="table-container",
+                        columns=[
+                                {'name': 'Website', 'id': 'Website'},
+                                {'name': 'Keywords tìm thấy', 'id': 'Keywords tìm thấy'},
+                                {'name': 'Link liên kết ngoài', 'id': 'Link liên kết ngoài'},
+                                {'name': 'Người dùng đăng nhập', 'id': 'Người dùng đăng nhập'},
+                                {'name': 'Yêu cầu nạp tiền', 'id': 'Yêu cầu nạp tiền'}],
+                        data=df.to_dict("records"),
+                        style_table = {"marginLeft": "10px","marginRight": "50px",},
+                        style_cell_conditional=[
+                            {
+                                'if': {'column_id': c},
+                                'textAlign': 'left',
+                            } for c in ["Website", "Keywords tìm thấy"]
+                        ] + [
+                            {
+                                'if': {'column_id': d},
+                                'textAlign': 'center',
+                            } for d in ["Link liên kết ngoài", "Người dùng đăng nhập", "Yêu cầu nạp tiền"]
+                        ],
+                        style_cell={
+                            'height': 'auto',
+                            'width': 'auto',
+                            'whiteSpace': 'normal',
+                        },
+                        style_data={
+                            'color': 'black',
+                            'backgroundColor': 'white',
+                            'fontFamily':'Times New Roman',
+                            'overflowX': 'auto'
+                        },
+                        style_data_conditional=[
+                            {
+                                'if': {'row_index': 'odd'},
+                                'backgroundColor': '#cce7ff',
+                            }
+                        ],
+                        style_header={
+                            'backgroundColor': '#66b3ff',
+                            'color': 'black',
+                            'fontWeight': 'bold',
+                            'fontSize': 15,
+                            'fontFamily':'Times New Roman',
                             'textAlign': 'center',
-                        } for d in ["Link liên kết ngoài", "Người dùng đăng nhập", "Yêu cầu nạp tiền"]
-                    ],
-                    style_cell={
-                        'height': 'auto',
-                        'width': 'auto',
-                        'whiteSpace': 'normal',
-                    },
-                    style_data={
-                        'color': 'black',
-                        'backgroundColor': 'white',
-                        'fontFamily':'Times New Roman',
-                        'overflowX': 'auto'
-                    },
-                    style_data_conditional=[
-                        {
-                            'if': {'row_index': 'odd'},
-                            'backgroundColor': '#cce7ff',
                         }
-                    ],
-                    style_header={
-                        'backgroundColor': '#66b3ff',
-                        'color': 'black',
-                        'fontWeight': 'bold',
-                        'fontSize': 15,
-                        'fontFamily':'Times New Roman',
-                        'textAlign': 'center',
-                    }
-                    )]
-            ),
-        style = {
-            'position': 'absolute',
-            'marginTop': '30px',
-        }
-    ),
-    dcc.Interval(
-        id='interval-component',
-        interval= INTERVAL_MS, # in milliseconds
-        n_intervals=0
-    ),
+                        )]
+                ),
+            style = {
+                'position': 'absolute',
+                'marginTop': '30px',
+            }
+        ),
+        dcc.Interval(
+            id='interval-component',
+            interval= INTERVAL_MS, # in milliseconds
+            n_intervals=0
+        ),
     ]),
     
 ], style = {
@@ -412,6 +411,8 @@ def button_validation(n_clicks, num_links, method, url):
     changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
     if ("run" in changed_id):
         if n_clicks > 0:
+            if os.path.isfile(RESULT_CSV):
+                os.remove(RESULT_CSV)
             files = uploaded_files()
             if method == None:
                 return ["Hãy chọn phương pháp upload danh sách MC ở Bước 1!", 0]
@@ -437,12 +438,16 @@ def button_validation(n_clicks, num_links, method, url):
     Input("num_links", "value"), Input("run", "n_clicks"),
     Input('demo-dropdown', 'value'), Input('mc_input', 'value'),],
 )
-def generate_table(uploaded_filenames, uploaded_file_contents, value, n_clicks, method, url):
+def run_code(uploaded_filenames, uploaded_file_contents, value, n_clicks, method, url):
     if method == "Upload file CSV":
         if (n_clicks != None) and (n_clicks > 0):
             
             for filename in os.listdir(UPLOAD_DIRECTORY):
                 path = os.path.join(UPLOAD_DIRECTORY, filename)
+                if " " in filename:
+                    filename = filename.replace(" ", "")
+                    os.rename(path, os.path.join(UPLOAD_DIRECTORY, filename))
+                    path = os.path.join(UPLOAD_DIRECTORY, filename)
                 if os.path.isfile(path):
                     if "csv" in str(path):
                         mc_file = path
@@ -460,10 +465,14 @@ def generate_table(uploaded_filenames, uploaded_file_contents, value, n_clicks, 
             
             for filename in os.listdir(UPLOAD_DIRECTORY):
                 path = os.path.join(UPLOAD_DIRECTORY, filename)
+                if " " in filename:
+                    filename = filename.replace(" ", "")
+                    os.rename(path, os.path.join(UPLOAD_DIRECTORY, filename))
+                    path = os.path.join(UPLOAD_DIRECTORY, filename)
                 if os.path.isfile(path):
                     if "xls" in str(path):
                         xlsfile = path
-            
+
             os.system('python3 run_scraper.py '+ url + ' ' + xlsfile + ' ' + str(value) + ' ' + RELATED_URLS)
             
             return [ None, None]
@@ -480,10 +489,10 @@ def show_result(n_intervals, n_clicks):
     if n_intervals >= 0:
         if n_clicks > 0:
             try:
-                res = pd.read_csv(RESULT_CSV)
+                res = pd.read_csv(RESULT_CSV, encoding="utf8")
             except:
-                time.sleep(1)
-                res = pd.read_csv(RESULT_CSV)
+                time.sleep(3)
+                res = pd.read_csv(RESULT_CSV, encoding="utf8")
 
             count = len(res.to_dict("records"))
             if count > 0:
@@ -491,10 +500,10 @@ def show_result(n_intervals, n_clicks):
             else:
                 return [res.to_dict("records"), "Đang scan..."]
         else:
-            a = pd.read_csv(SAMPLE_FILE)
+            a = pd.read_csv(SAMPLE_FILE, encoding="utf8")
             return [a.to_dict("records"), "Xin mời tham khảo sample!"]
     else:
-        a = pd.read_csv(SAMPLE_FILE)
+        a = pd.read_csv(SAMPLE_FILE, encoding="utf8")
         return [a.to_dict("records"), "Xin mời tham khảo sample!"]
 
 '''

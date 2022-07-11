@@ -9,7 +9,6 @@ import csv
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
-import threading
 
 
 #MAX_LINKS = 5     # max follow links per merchant
@@ -26,6 +25,8 @@ def get_URLs_to_list(filename):
         web = row[3]
         if (web != "NULL"):
             if web not in url_list:
+                #if ("http://" not in web) and ("https://" not in web):
+                #    web = "https://" + web
                 url_list.append(web)
 
     return url_list
@@ -76,10 +77,7 @@ class Driver:
         print('The driver has terminated.')
 
 
-threadLocal = threading.local()
-
-
-def configure_chrome_driver():
+def configure_chrome_driver(threadLocal):
     the_driver = getattr(threadLocal, 'the_driver', None)
     if the_driver is None:
         the_driver = Driver()
@@ -87,7 +85,7 @@ def configure_chrome_driver():
     return the_driver.driver
 
 
-def findKeyword(website, wordlist, num_links, related_urls, writer, result_file):
+def findKeyword(website, wordlist, num_links, related_urls, writer, result_file, threadLocal):
     
     external_links = False
     user_login = False
@@ -99,26 +97,47 @@ def findKeyword(website, wordlist, num_links, related_urls, writer, result_file)
         domain = (website.replace("http://", "")).split("/")[0]
     domain = domain.replace(".", "")
     domain = domain.replace("www", "")
-    f = open(f"{related_urls}{domain}.csv", 'w')
+    f = open(f"{related_urls}{domain}.csv", 'w', encoding="utf8")
 
     web_dict = {}
     web_dict["Website"] = website
 
-    driver = configure_chrome_driver()
+    driver = configure_chrome_driver(threadLocal)
     try:
         driver.get(website)
     except:
-        print("Không reach được website " + website + "\n")
-        f.write("Không reach được website " + website + "\n")
-        web_dict["Keywords tìm thấy"] = "'N/A'"
-        web_dict["Link liên kết ngoài"] = "'N/A'"
-        web_dict["Người dùng đăng nhập"] = "'N/A'"
-        web_dict["Yêu cầu nạp tiền"] = "'N/A'"
+        if "https://" in website:
+            website = website.replace("https://", "http://")
+        elif "http://" in website:
+            website = website.replace("http://", "https://")
+        else:
+            website = "https://"+website
+        try:
+            driver.get(website)
+        except:
+            if "www." in website:
+                website = website.replace("www.", "")
+            else:
+                if "http://" in website:
+                    website = website.replace("http://", "http://www.")
+                elif "https://" in website:
+                    website = website.replace("https://", "https://www.")
+                else:
+                    website = "https://www."+website
+            try:
+                driver.get(website)
+            except:
+                print("Không reach được website " + website + "\n")
+                f.write("Không reach được website " + website + "\n")
+                web_dict["Keywords tìm thấy"] = "'N/A'"
+                web_dict["Link liên kết ngoài"] = "'N/A'"
+                web_dict["Người dùng đăng nhập"] = "'N/A'"
+                web_dict["Yêu cầu nạp tiền"] = "'N/A'"
 
-        writer.writerow(web_dict)
-        result_file.flush()
+                writer.writerow(web_dict)
+                result_file.flush()
 
-        return web_dict
+                return web_dict
 
     try:
         WebDriverWait(driver, 15).until(
@@ -246,6 +265,7 @@ def findKeyword(website, wordlist, num_links, related_urls, writer, result_file)
 
     return web_dict
         
+
 '''         
 def main():
     
