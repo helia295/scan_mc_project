@@ -73,7 +73,8 @@ class Driver:
 
 
     def __del__(self):
-        self.driver.quit() # clean up driver when we are cleaned up
+        if self.driver != None:
+            self.driver.quit() # clean up driver when we are cleaned up
         print('The driver has terminated.')
 
 
@@ -90,14 +91,15 @@ def findKeyword(website, wordlist, num_links, related_urls, writer, result_file,
     external_links = False
     user_login = False
     nap_tien = False
-    domain = ""
+
+    '''domain = ""
     if "https://" in website:
         domain = (website.replace("https://", "")).split("/")[0]
     elif "http://" in website:
         domain = (website.replace("http://", "")).split("/")[0]
     domain = domain.replace(".", "")
     domain = domain.replace("www", "")
-    f = open(f"{related_urls}{domain}.csv", 'w', encoding="utf8")
+    f = open(f"{related_urls}{domain}.csv", 'w', encoding="utf8")'''
 
     web_dict = {}
     web_dict["Website"] = website
@@ -127,8 +129,8 @@ def findKeyword(website, wordlist, num_links, related_urls, writer, result_file,
             try:
                 driver.get(website)
             except:
-                print("Không reach được website " + website + "\n")
-                f.write("Không reach được website " + website + "\n")
+                #print("Không reach được website " + website + "\n")
+                #f.write("Không reach được website " + website + "\n")
                 web_dict["Keywords tìm thấy"] = "'N/A'"
                 web_dict["Link liên kết ngoài"] = "'N/A'"
                 web_dict["Người dùng đăng nhập"] = "'N/A'"
@@ -140,18 +142,18 @@ def findKeyword(website, wordlist, num_links, related_urls, writer, result_file,
                 return web_dict
 
     try:
-        WebDriverWait(driver, 15).until(
+        WebDriverWait(driver, 10).until(
             lambda s: s.find_element(by=By.CLASS_NAME, value="content").is_displayed())
     except:
         try:
-            WebDriverWait(driver, 15).until(
+            WebDriverWait(driver, 10).until(
                 lambda r: r.find_element(by=By.ID, value="content").is_displayed())
         except:
             try:
-                WebDriverWait(driver, 15).until(
+                WebDriverWait(driver, 10).until(
                     lambda j: j.find_element(by=By.CLASS_NAME, value="container").is_displayed())
             except:
-                driver.implicitly_wait(30)
+                driver.implicitly_wait(20)
 
     soup = BeautifulSoup(driver.page_source, "lxml")
     #print(soup.prettify())
@@ -165,7 +167,7 @@ def findKeyword(website, wordlist, num_links, related_urls, writer, result_file,
     seen_domain = []    # to avoid seen domain
     ### Collect all scanned external urls to csv file 
     
-    f.write("Những website liên kết với " + website + "\n")
+    #f.write("Những website liên kết với " + website + "\n")
     for url in url_list:
         if url not in seen:
             #print("Scanning " + url)
@@ -217,11 +219,11 @@ def findKeyword(website, wordlist, num_links, related_urls, writer, result_file,
                     #print("Searching for " + word)
                     match = re.search((" " + word + " "), str(soup))
                     if match != None:
-                        print("Tìm thấy " + word + " trên " + website + " với context \"" + (str(soup))[(match.start()-5):(match.end()+5)] + "\";\n")
+                        #print("Tìm thấy " + word + " trên " + website + " với context \"" + (str(soup))[(match.start()-5):(match.end()+5)] + "\";\n")
                         found.append(word)
 
                         # Check if Nap tien is required
-                        if word == "nạp tiền":
+                        if str(word) == 'nạp tiền':
                             nap_tien = True
             seen.append(url)
 
@@ -229,22 +231,22 @@ def findKeyword(website, wordlist, num_links, related_urls, writer, result_file,
                 if "https://" in url:
                     dom = (url.replace("https://", "")).split("/")[0]
                     if dom not in seen_domain:
-                        f.write(dom + '\n')
+                        #f.write(dom + '\n')
                         seen_domain.append(dom)
                         external_links = True
                 elif ("http://" in url) and ("https://" not in url):
                     dom = (url.replace("http://", "")).split("/")[0]
                     if dom not in seen_domain:
-                        f.write(dom + '\n')
+                        #f.write(dom + '\n')
                         seen_domain.append(dom)
                         external_links = True
             if "login" in url:
                 user_login = True
-    f.close()
+    #f.close()
 
     ### Result
-    if found == []:
-        print("Không tìm thấy keyword nào trên " + website + ".\n")
+    #if found == []:
+        #print("Không tìm thấy keyword nào trên " + website + ".\n")
     
     web_dict["Keywords tìm thấy"] = str(found)
     if external_links == True:
@@ -255,7 +257,7 @@ def findKeyword(website, wordlist, num_links, related_urls, writer, result_file,
         web_dict["Người dùng đăng nhập"] = "Có"
     else:
         web_dict["Người dùng đăng nhập"] = "Không"
-    if user_login == True:
+    if nap_tien == True:
         web_dict["Yêu cầu nạp tiền"] = "Có"
     else:
         web_dict["Yêu cầu nạp tiền"] = "Không"

@@ -74,7 +74,7 @@ app.layout = html.Div([
             'marginLeft': '30px',}
     ),
 
-    html.H4("Lựa chọn giữa upload toàn bộ merchants cần scan lên dưới dạng file csv HOẶC nhập thủ công từng website để scan.",
+    html.H4("Lựa chọn giữa upload toàn bộ danh sách merchants lên dưới dạng file csv HOẶC nhập thủ công từng link website để scan.",
             style = {
                 'fontFamily': 'Times New Roman',
                 'fontSize': 15,
@@ -112,7 +112,7 @@ app.layout = html.Div([
         dcc.Input(
                 id="mc_input",
                 type="url",
-                placeholder="Nhập url vào đây.",
+                placeholder="Nhập url vào đây. Ex: https://example.com/.",
                 debounce=True,
                 #required = "required",
                 )
@@ -181,7 +181,7 @@ app.layout = html.Div([
                 'marginLeft': '30px',}
     ),
 
-    html.H4("Giới hạn số lượng link phải scan cho mỗi Merchant sẽ giúp đẩy nhanh kết quả. Gợi ý: <=50 links/merchant.",
+    html.H4("Giới hạn số lượng link phải scan cho mỗi Merchant sẽ giúp đẩy nhanh kết quả. Gợi ý: <=30 links/merchant.",
             style = {
                 'fontFamily': 'Times New Roman',
                 'fontSize': 15,
@@ -317,7 +317,7 @@ app.layout = html.Div([
         dcc.Interval(
             id='interval-component',
             interval= INTERVAL_MS, # in milliseconds
-            n_intervals=0
+            n_intervals=0,
         ),
     ]),
     
