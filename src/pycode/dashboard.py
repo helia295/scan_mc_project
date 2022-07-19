@@ -96,6 +96,7 @@ app.layout = html.Div([
                         'marginBottom': '15px', 
                     },
     ),
+    
     html.Div(id='dd-output-container',
             style = {
                 'fontFamily': 'Times New Roman',

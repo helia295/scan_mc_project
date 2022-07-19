@@ -1,6 +1,6 @@
 import os
 import sys
-from tracemalloc import start
+#import tracemalloc
 import csv
 from multiprocessing.pool import ThreadPool
 import itertools
@@ -45,6 +45,7 @@ def main():
         res = list(pool.starmap(findKeyword, [*zip(start_URLs, itertools.repeat(wordlist), itertools.repeat(int(value)), itertools.repeat(RELATED_URLS), itertools.repeat(writer), itertools.repeat(f), itertools.repeat(threadLocal))]))
         # must be done before terminate is explicitly or implicitly called on the pool:
         del threadLocal
+        
         gc.collect()
 
     pool.terminate()

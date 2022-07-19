@@ -1,7 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import TimeoutException
+#from selenium.common.exceptions import TimeoutException
 from bs4 import BeautifulSoup
 import re
 from pandas import *
@@ -75,7 +75,7 @@ class Driver:
     def __del__(self):
         if self.driver != None:
             self.driver.quit() # clean up driver when we are cleaned up
-        print('The driver has terminated.')
+        #print('The driver has terminated.')
 
 
 def configure_chrome_driver(threadLocal):
@@ -165,9 +165,10 @@ def findKeyword(website, wordlist, num_links, related_urls, writer, result_file,
     seen = []   # to avoid visiting duplicate urls
     found = []     # to avoid scanning already found words
     seen_domain = []    # to avoid seen domain
+
     ### Collect all scanned external urls to csv file 
-    
     #f.write("Những website liên kết với " + website + "\n")
+
     for url in url_list:
         if url not in seen:
             #print("Scanning " + url)
@@ -210,7 +211,8 @@ def findKeyword(website, wordlist, num_links, related_urls, writer, result_file,
             ### Check if Nap tien is required
             vi_match1 = re.search("Nạp tiền vào ví", str(soup))
             vi_match2 = re.search("số dư ví", str(soup))
-            if (vi_match1 != None) or (vi_match2 != None):
+            vi_match3 = re.search("ví điện tử", str(soup))
+            if (vi_match1 != None) or (vi_match2 != None) or (vi_match3 != None):
                 nap_tien = True
             
             ### Scan keywords
