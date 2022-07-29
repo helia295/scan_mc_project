@@ -49,327 +49,304 @@ def server_layout():
     if proc != None:
         proc.terminate()
     return html.Div([
-    html.Div(children=[
-        html.H1(
-            children='CÔNG CỤ SCAN WEBSITE CỦA MERCHANT',
-            style={
-                'fontFamily': "Times New Roman",
-                'fontSize': 28,
-                'fontWeight': 'bold',
-                #"color": "#0059b3",
-                'display':'inline', 
-                'paddingTop': '30px'}
-        ),
-        html.Img(src=("data:image/png;base64,{}").format(encoded_image.decode()),
-                    style = {'display':'inline', 
-                            'width': '95px', 
-                            'height': '95px',
-                            'padding': '15px'
-                            })
-    ], style={
-        'display': 'flex',
-        'textAlign': 'center',
-        'alignItem': 'center',
-        'justifyContent': 'center',}
-    ),
-    
-    html.H2("Bước 1: Chọn cách input website(s) cần scan.", 
-        style = {
-            'fontFamily': 'Times New Roman',
-            'fontSize': 21,
-            'fontWeight': 'bold',
-            'marginLeft': '30px',}
-    ),
-
-    html.H4("Lựa chọn giữa upload toàn bộ danh sách merchants lên dưới dạng file csv HOẶC nhập thủ công từng link website để scan.",
-            style = {
-                'fontFamily': 'Times New Roman',
-                'fontSize': 15,
-                'fontStyle': 'italic',
-                'textAlign': 'center',
-                'fontWeight': 'normal',}
-    ),
-
-    dcc.Dropdown(['Upload file CSV', 'Nhập url thủ công'], id='demo-dropdown',
+        html.Div(children=[
+            html.H1(
+                children='CÔNG CỤ SCAN WEBSITE CỦA MERCHANT',
                 style={
-                        "width": "100%",
-                        "height": "31px",
-                        "lineHeight": "31px",
-                        "textAlign": "center",
-                        "marginLeft": "5px",
-                        "fontFamily": "Times New Roman",
-                        "color": "gray",
-                        "fontSize": 15,
-                        'marginBottom': '15px', 
-                    },
-    ),
-
-    html.Div(id='dd-output-container',
-            style = {
-                'fontFamily': 'Times New Roman',
-                'fontSize': 15,
-                'fontStyle': 'italic',
-                'textAlign': 'center',
-                'fontWeight': 'normal',
-                'color': 'blue',
-                'marginBottom': '20px',
-                'persistence': 'False'}
-    ),
-
-    html.Div([
-        dcc.Input(
-                id="mc_input",
-                type="url",
-                placeholder="Nhập url vào đây. Ex: https://example.com/.",
-                debounce=True,
-                #required = "required",
-                )
-        ], style= {}
-    ),
-    
-    html.H2("Bước 2: Upload File(s).", 
-        style = {
-            'fontFamily': 'Times New Roman',
-            'fontSize': 21,
-            'fontWeight': 'bold',
-            'marginLeft': '30px',}
-    ),
-
-    html.H4(id="upload-prompt", 
-            style = {
-                'fontFamily': 'Times New Roman',
-                'fontSize': 15,
-                'fontStyle': 'italic',
-                'textAlign': 'center',
-                'fontWeight': 'normal',}
-    ),
-
-    dcc.Upload(
-        id="upload-data",
-        children=html.Div(
-            ["Kéo thả hoặc Bấm vào đây để chọn file(s) cần upload."]
+                    'fontFamily': "Times New Roman",
+                    'fontSize': 28,
+                    'fontWeight': 'bold',
+                    #"color": "#0059b3",
+                    'display':'inline', 
+                    'paddingTop': '30px'}
+            ),
+            html.Img(src=("data:image/png;base64,{}").format(encoded_image.decode()),
+                        style = {'display':'inline', 
+                                'width': '95px', 
+                                'height': '95px',
+                                'padding': '15px'
+                                })
+        ], style={
+            'display': 'flex',
+            'textAlign': 'center',
+            'alignItem': 'center',
+            'justifyContent': 'center',}
         ),
-        style={
-            "width": "100%",
-            "height": "31px",
-            "lineHeight": "31px",
-            "borderWidth": "1px",
-            "borderStyle": "solid",
-            "borderRadius": "2px",
-            "textAlign": "center",
-            "marginLeft": "10px",
-            "fontFamily": "Times New Roman",
-            "color": "gray",
-            "fontSize": 15,
-        },
-        multiple=True,
-    ),
-    
-    html.H3("Danh sách File đã tải lên:",
-            style = {
-                'fontFamily': 'Times New Roman',
-                'fontSize': 18,
-                'fontWeight': 'bold',
-                'marginLeft': '30px',
-                'marginTop': '20px',
-                'color': '#004d99',}
-    ),
-
-    html.Ul(id="file-list", 
-            style = {
-                'fontFamily': 'Times New Roman',
-                'marginLeft': '45px',}
-    ),
-
-    html.H2("Bước 3: Nhập số lượng link để scan cho mỗi Merchant.",
+        
+        html.H2("Bước 1: Chọn cách input website(s) cần scan.", 
             style = {
                 'fontFamily': 'Times New Roman',
                 'fontSize': 21,
                 'fontWeight': 'bold',
                 'marginLeft': '30px',}
-    ),
+        ),
 
-    html.H4("Giới hạn số lượng link phải scan cho mỗi Merchant sẽ giúp đẩy nhanh kết quả. Gợi ý: <=30 links/merchant.",
-            style = {
-                'fontFamily': 'Times New Roman',
-                'fontSize': 15,
-                'fontStyle': 'italic',
-                'textAlign': 'center',
-                'fontWeight': 'normal',}
-    ),
-
-    dcc.Input(id="num_links", type="number", min=1,
-            placeholder="Điền số links/merchant vào đây.", 
-            style={'textAlign': 'center',
-                    'fontSize': 15,
-                    'marginLeft':'10px',
-                    'height': '31px', 
-                    'width': '100%',
-                    'marginBottom': '5px', 
+        html.H4("Lựa chọn giữa upload toàn bộ danh sách merchants lên dưới dạng file csv HOẶC nhập thủ công từng link website để scan.",
+                style = {
                     'fontFamily': 'Times New Roman',
-                    'color': 'black'},
-            debounce=True,
-            #required = "required",
-    ),
+                    'fontSize': 15,
+                    'fontStyle': 'italic',
+                    'textAlign': 'center',
+                    'fontWeight': 'normal',}
+        ),
 
-    html.H2("Bước 4: Bấm nút chạy lấy Kết quả.",
-            style = {
-                'fontFamily': 'Times New Roman',
-                'fontSize': 21,
-                'fontWeight': 'bold',
-                'marginLeft': '30px',
-                'marginBottom': '10px',}
-    ),
-    
-    html.Div([
-    html.Button('Chạy chương trình', id='run', n_clicks=0,
-                style = {'backgroundColor': 'white',
-                        'color': '#004d99',
-                        'height': '30px',
-                        'width': '200px',
-                        'borderWidth': '1px',
-                        'borderStyle': 'solid',
-                        'borderColor': '#004d99',
-                        'textAlign': 'center',
-                        'fontFamily': 'Times New Roman',
-                        'fontSize': 17,
-                        'marginRight': 20,
-                        'verticalAlign': 'middle',}
-    ),
+        dcc.Dropdown(['Upload file CSV', 'Nhập url thủ công'], id='demo-dropdown',
+                    style={
+                            "width": "100%",
+                            "height": "31px",
+                            "lineHeight": "31px",
+                            "textAlign": "center",
+                            "marginLeft": "5px",
+                            "fontFamily": "Times New Roman",
+                            "color": "gray",
+                            "fontSize": 15,
+                            'marginBottom': '15px', 
+                        },
+        ),
 
-    html.Button('Dừng chương trình', id='stop', n_clicks=0,
-                style = {'backgroundColor': 'white',
-                        'color': 'red',
-                        'height': '30px',
-                        'width': '200px',
-                        'borderWidth': '1px',
-                        'borderStyle': 'solid',
-                        'borderColor': 'red',
-                        'textAlign': 'center',
-                        'fontFamily': 'Times New Roman',
-                        'fontSize': 17,
-                        'verticalAlign': 'middle',}
-    ),
-    ], style = {
-                'marginLeft': 'auto',
-                'marginRight': 'auto',
-                'marginBottom': '15px',
-                'verticalAlign': 'middle',
-                'display': 'flex',
-                'textAlign': 'center',
-                'alignItem': 'center',
-                'justifyContent': 'center',
-
-    }),
-
-    html.Div(id = "button-validation", 
-            style = {
-                'fontFamily': 'Times New Roman',
-                'fontSize': 15,
-                'fontStyle': 'italic',
-                'textAlign': 'center',
-                'fontWeight': 'normal',
-                'color': 'red',
-                'marginBottom': '20px',
-                'persistence': 'False'}
-    ),
-
-    html.Div(id = "stop-validation", 
-            style = {
-                'fontFamily': 'Times New Roman',
-                'fontSize': 15,
-                'fontStyle': 'italic',
-                'textAlign': 'center',
-                'fontWeight': 'normal',
-                'color': 'red',
-                'marginBottom': '20px',
-                'persistence': 'False'}
-    ),
-
-    html.Div([
-        html.Div(id = "button-running", 
+        html.Div(id='dd-output-container',
                 style = {
                     'fontFamily': 'Times New Roman',
                     'fontSize': 15,
                     'fontStyle': 'italic',
                     'textAlign': 'center',
                     'fontWeight': 'normal',
-                    'color': "blue",
+                    'color': 'blue',
                     'marginBottom': '20px',
                     'persistence': 'False'}
         ),
 
-        dcc.Loading(
-                id="loading-table",
-                type="circle",
-                children=html.Div(id='result-table', 
-                        children=[dash_table.DataTable(
-                        id="table-container",
-                        columns=[
-                                {'name': 'Website', 'id': 'Website'},
-                                {'name': 'Keywords tìm thấy', 'id': 'Keywords tìm thấy'},
-                                {'name': 'Link liên kết ngoài', 'id': 'Link liên kết ngoài'},
-                                {'name': 'Người dùng đăng nhập', 'id': 'Người dùng đăng nhập'},
-                                {'name': 'Yêu cầu nạp tiền', 'id': 'Yêu cầu nạp tiền'}],
-                        data=df.to_dict("records"),
-                        page_size= 50,
-                        style_table = {"marginLeft": "10px","marginRight": "50px",},
-                        style_cell_conditional=[
-                            {
-                                'if': {'column_id': c},
-                                'textAlign': 'left',
-                            } for c in ["Website", "Keywords tìm thấy"]
-                        ] + [
-                            {
-                                'if': {'column_id': d},
-                                'textAlign': 'center',
-                            } for d in ["Link liên kết ngoài", "Người dùng đăng nhập", "Yêu cầu nạp tiền"]
-                        ],
-                        style_cell={
-                            'height': 'auto',
-                            'width': 'auto',
-                            'whiteSpace': 'normal',
-                        },
-                        style_data={
-                            'color': 'black',
-                            'backgroundColor': 'white',
-                            'fontFamily':'Times New Roman',
-                            'overflowX': 'auto'
-                        },
-                        style_data_conditional=[
-                            {
-                                'if': {'row_index': 'odd'},
-                                'backgroundColor': '#cce7ff',
-                            }
-                        ],
-                        style_header={
-                            'backgroundColor': '#66b3ff',
-                            'color': 'black',
-                            'fontWeight': 'bold',
-                            'fontSize': 15,
-                            'fontFamily':'Times New Roman',
-                            'textAlign': 'center',
-                        }
-                        )]
-                ),
+        html.Div([
+            dcc.Input(
+                    id="mc_input",
+                    type="url",
+                    placeholder="Nhập url vào đây. Ex: https://example.com/.",
+                    debounce=True,
+                    #required = "required",
+                    )
+            ], style= {}
+        ),
+        
+        html.H2("Bước 2: Upload File(s).", 
             style = {
-                'position': 'absolute',
-                'marginTop': '30px',
-            }
+                'fontFamily': 'Times New Roman',
+                'fontSize': 21,
+                'fontWeight': 'bold',
+                'marginLeft': '30px',}
         ),
-        dcc.Interval(
-            id='interval-component',
-            interval= INTERVAL_MS, # in milliseconds
-            n_intervals=0,
+
+        html.H4(id="upload-prompt", 
+                style = {
+                    'fontFamily': 'Times New Roman',
+                    'fontSize': 15,
+                    'fontStyle': 'italic',
+                    'textAlign': 'center',
+                    'fontWeight': 'normal',}
         ),
-    ]),
-    
-], style = {
-    'marginRight': '40px',
-    'marginLeft': '25px',
-    'marginTop': '10px',
-    'marginBottom': '30px',}
-)
+
+        dcc.Upload(
+            id="upload-data",
+            children=html.Div(
+                ["Kéo thả hoặc Bấm vào đây để chọn file(s) cần upload."]
+            ),
+            style={
+                "width": "100%",
+                "height": "31px",
+                "lineHeight": "31px",
+                "borderWidth": "1px",
+                "borderStyle": "solid",
+                "borderRadius": "2px",
+                "textAlign": "center",
+                "marginLeft": "10px",
+                "fontFamily": "Times New Roman",
+                "color": "gray",
+                "fontSize": 15,
+            },
+            multiple=True,
+        ),
+        
+        html.H3("Danh sách File đã tải lên:",
+                style = {
+                    'fontFamily': 'Times New Roman',
+                    'fontSize': 18,
+                    'fontWeight': 'bold',
+                    'marginLeft': '30px',
+                    'marginTop': '20px',
+                    'color': '#004d99',}
+        ),
+
+        html.Ul(id="file-list", 
+                style = {
+                    'fontFamily': 'Times New Roman',
+                    'marginLeft': '45px',}
+        ),
+
+        html.H2("Bước 3: Nhập số lượng link để scan cho mỗi Merchant.",
+                style = {
+                    'fontFamily': 'Times New Roman',
+                    'fontSize': 21,
+                    'fontWeight': 'bold',
+                    'marginLeft': '30px',}
+        ),
+
+        html.H4("Giới hạn số lượng link phải scan cho mỗi Merchant sẽ giúp đẩy nhanh kết quả. Gợi ý: <=30 links/merchant.",
+                style = {
+                    'fontFamily': 'Times New Roman',
+                    'fontSize': 15,
+                    'fontStyle': 'italic',
+                    'textAlign': 'center',
+                    'fontWeight': 'normal',}
+        ),
+
+        dcc.Input(id="num_links", type="number", min=1,
+                placeholder="Điền số links/merchant vào đây.", 
+                style={'textAlign': 'center',
+                        'fontSize': 15,
+                        'marginLeft':'10px',
+                        'height': '31px', 
+                        'width': '100%',
+                        'marginBottom': '5px', 
+                        'fontFamily': 'Times New Roman',
+                        'color': 'black'},
+                debounce=True,
+                #required = "required",
+        ),
+
+        html.H2("Bước 4: Bấm nút chạy lấy Kết quả.",
+                style = {
+                    'fontFamily': 'Times New Roman',
+                    'fontSize': 21,
+                    'fontWeight': 'bold',
+                    'marginLeft': '30px',
+                    'marginBottom': '10px',}
+        ),
+        
+        html.Div([
+        html.Button('Chạy chương trình', id='run', n_clicks=0,
+        ),
+
+        html.Button('Dừng chương trình', id='stop', n_clicks=0,
+        ),
+        ], style = {
+                    'marginLeft': 'auto',
+                    'marginRight': 'auto',
+                    'marginBottom': '15px',
+                    'verticalAlign': 'middle',
+                    'display': 'flex',
+                    'textAlign': 'center',
+                    'alignItem': 'center',
+                    'justifyContent': 'center',
+
+        }),
+
+        html.Div(id = "button-validation", 
+                style = {
+                    'fontFamily': 'Times New Roman',
+                    'fontSize': 15,
+                    'fontStyle': 'italic',
+                    'textAlign': 'center',
+                    'fontWeight': 'normal',
+                    'color': 'red',
+                    'marginBottom': '20px',
+                    'persistence': 'False'}
+        ),
+
+        html.Div(id = "stop-validation", 
+                style = {
+                    'fontFamily': 'Times New Roman',
+                    'fontSize': 15,
+                    'fontStyle': 'italic',
+                    'textAlign': 'center',
+                    'fontWeight': 'normal',
+                    'color': 'red',
+                    'marginBottom': '20px',
+                    'persistence': 'False'}
+        ),
+
+        html.Div([
+            html.Div(id = "button-running", 
+                    style = {
+                        'fontFamily': 'Times New Roman',
+                        'fontSize': 15,
+                        'fontStyle': 'italic',
+                        'textAlign': 'center',
+                        'fontWeight': 'normal',
+                        'color': "blue",
+                        'marginBottom': '20px',
+                        'persistence': 'False'}
+            ),
+
+            dcc.Loading(
+                    id="loading-table",
+                    type="circle",
+                    children=html.Div(id='result-table', 
+                            children=[dash_table.DataTable(
+                            id="table-container",
+                            columns=[
+                                    {'name': 'Website', 'id': 'Website'},
+                                    {'name': 'Keywords tìm thấy', 'id': 'Keywords tìm thấy'},
+                                    {'name': 'Link liên kết ngoài', 'id': 'Link liên kết ngoài'},
+                                    {'name': 'Người dùng đăng nhập', 'id': 'Người dùng đăng nhập'},
+                                    {'name': 'Yêu cầu nạp tiền', 'id': 'Yêu cầu nạp tiền'}],
+                            data=df.to_dict("records"),
+                            page_size= 50,
+                            style_table = {"marginLeft": "10px","marginRight": "50px",},
+                            style_cell_conditional=[
+                                {
+                                    'if': {'column_id': c},
+                                    'textAlign': 'left',
+                                } for c in ["Website", "Keywords tìm thấy"]
+                            ] + [
+                                {
+                                    'if': {'column_id': d},
+                                    'textAlign': 'center',
+                                } for d in ["Link liên kết ngoài", "Người dùng đăng nhập", "Yêu cầu nạp tiền"]
+                            ],
+                            style_cell={
+                                'height': 'auto',
+                                'width': 'auto',
+                                'whiteSpace': 'normal',
+                            },
+                            style_data={
+                                'color': 'black',
+                                'backgroundColor': 'white',
+                                'fontFamily':'Times New Roman',
+                                'overflowX': 'auto'
+                            },
+                            style_data_conditional=[
+                                {
+                                    'if': {'row_index': 'odd'},
+                                    'backgroundColor': '#cce7ff',
+                                }
+                            ],
+                            style_header={
+                                'backgroundColor': '#66b3ff',
+                                'color': 'black',
+                                'fontWeight': 'bold',
+                                'fontSize': 15,
+                                'fontFamily':'Times New Roman',
+                                'textAlign': 'center',
+                            }
+                            )]
+                    ),
+                style = {
+                    'position': 'absolute',
+                    'marginTop': '30px',
+                }
+            ),
+            dcc.Interval(
+                id='interval-component',
+                interval= INTERVAL_MS, # in milliseconds
+                n_intervals=0,
+            ),
+        ]),
+        
+    ], style = {
+        'marginRight': '40px',
+        'marginLeft': '25px',
+        'marginTop': '10px',
+        'marginBottom': '30px',}
+    )
 
 app.layout = server_layout
 
@@ -394,6 +371,67 @@ def file_download_link(filename):
     """Create a Plotly Dash 'A' element that downloads a file from the app."""
     location = "/download/{}".format(urlquote(filename))
     return html.A(filename, href=location)
+
+
+@app.callback(
+    [Output('stop', 'style'), Output('stop', 'disabled'),
+    Output('run', 'style'), Output('run', 'disabled')], 
+    [Input('stop', 'n_clicks'), Input('run', 'n_clicks')])
+def button_on_off(stop_clicks, n_clicks):
+    run_button_on = {'backgroundColor': 'white',
+                    'color': '#004d99',
+                    'height': '30px',
+                    'width': '200px',
+                    'borderWidth': '1px',
+                    'borderStyle': 'solid',
+                    'borderColor': '#004d99',
+                    'textAlign': 'center',
+                    'fontFamily': 'Times New Roman',
+                    'fontSize': 17,
+                    'marginRight': 20,
+                    'verticalAlign': 'middle',}
+    run_button_off = {'backgroundColor': '#d3d3d3',
+                    'color': '#004d99',
+                    'height': '30px',
+                    'width': '200px',
+                    'borderWidth': '1px',
+                    'borderStyle': 'solid',
+                    'borderColor': '#004d99',
+                    'textAlign': 'center',
+                    'fontFamily': 'Times New Roman',
+                    'fontSize': 17,
+                    'marginRight': 20,
+                    'verticalAlign': 'middle',}
+    stop_button_on = {'backgroundColor': 'white',
+                            'color': 'red',
+                            'height': '30px',
+                            'width': '200px',
+                            'borderWidth': '1px',
+                            'borderStyle': 'solid',
+                            'borderColor': 'red',
+                            'textAlign': 'center',
+                            'fontFamily': 'Times New Roman',
+                            'fontSize': 17,
+                            'verticalAlign': 'middle',}
+    stop_button_off = {'backgroundColor': '#d3d3d3',
+                            'color': 'red',
+                            'height': '30px',
+                            'width': '200px',
+                            'borderWidth': '1px',
+                            'borderStyle': 'solid',
+                            'borderColor': 'red',
+                            'textAlign': 'center',
+                            'fontFamily': 'Times New Roman',
+                            'fontSize': 17,
+                            'verticalAlign': 'middle',}
+    if (n_clicks < 1) and (stop_clicks < 1):
+        return [stop_button_off, True, run_button_on, False]
+    elif (n_clicks >= 1) and (stop_clicks < 1):
+        return [stop_button_on, False, run_button_off, True]
+    elif (n_clicks < 1) and (stop_clicks >= 1):
+        return [stop_button_off, True, run_button_on, False]
+    else:
+        return [stop_button_on, False, run_button_off, True]
 
 
 @app.callback(
@@ -486,7 +524,7 @@ def stop_validation(stop_clicks, n_clicks):
         if stop_clicks > 0:
             if (proc != None) and (n_clicks >= 1):
                 proc.terminate()
-                return ["Chương trình đã dừng chạy! Để chạy lại từ đầu hãy reload page.", 0]
+                return ["Chương trình đã dừng chạy! Để chạy lại từ đầu hãy xoá và thực hiện lại từ Bước 1.", 1]
             if (proc != None) and (n_clicks < 1):
                 return ["Chương trình chưa bắt đầu chạy!", 0]
             if (proc == None) and (n_clicks < 1):
