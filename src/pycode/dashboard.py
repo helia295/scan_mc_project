@@ -13,6 +13,7 @@ from flask import Flask, send_from_directory
 import dash
 import time
 from dotenv import dotenv_values
+import subprocess
 
 config = dotenv_values("./.env")
 
@@ -23,6 +24,9 @@ RELATED_URLS = config['RELATED_URLS']
 RESULT_CSV = config['RESULT_CSV']
 INTERVAL_MS = int(config['INTERVAL_MS'])
 LOGO_PATH = "./assets/logo.png"
+
+#to store current process
+proc = None
 
 encoded_image = base64.b64encode(open(LOGO_PATH, 'rb').read())
 
@@ -40,8 +44,11 @@ def download(path):
     """Serve a file from the upload directory."""
     return send_from_directory(UPLOAD_DIRECTORY, path, as_attachment=True)
 
-
-app.layout = html.Div([
+def server_layout():
+    global proc
+    if proc != None:
+        proc.terminate()
+    return html.Div([
     html.Div(children=[
         html.H1(
             children='CÔNG CỤ SCAN WEBSITE CỦA MERCHANT',
@@ -96,7 +103,7 @@ app.layout = html.Div([
                         'marginBottom': '15px', 
                     },
     ),
-    
+
     html.Div(id='dd-output-container',
             style = {
                 'fontFamily': 'Times New Roman',
@@ -213,8 +220,8 @@ app.layout = html.Div([
                 'marginLeft': '30px',
                 'marginBottom': '10px',}
     ),
-
     
+    html.Div([
     html.Button('Chạy chương trình', id='run', n_clicks=0,
                 style = {'backgroundColor': 'white',
                         'color': '#004d99',
@@ -226,14 +233,48 @@ app.layout = html.Div([
                         'textAlign': 'center',
                         'fontFamily': 'Times New Roman',
                         'fontSize': 17,
-                        'display': 'block',
-                        'marginLeft': 'auto',
-                        'marginRight': 'auto',
-                        'marginBottom': '15px',
+                        'marginRight': 20,
                         'verticalAlign': 'middle',}
     ),
 
+    html.Button('Dừng chương trình', id='stop', n_clicks=0,
+                style = {'backgroundColor': 'white',
+                        'color': 'red',
+                        'height': '30px',
+                        'width': '200px',
+                        'borderWidth': '1px',
+                        'borderStyle': 'solid',
+                        'borderColor': 'red',
+                        'textAlign': 'center',
+                        'fontFamily': 'Times New Roman',
+                        'fontSize': 17,
+                        'verticalAlign': 'middle',}
+    ),
+    ], style = {
+                'marginLeft': 'auto',
+                'marginRight': 'auto',
+                'marginBottom': '15px',
+                'verticalAlign': 'middle',
+                'display': 'flex',
+                'textAlign': 'center',
+                'alignItem': 'center',
+                'justifyContent': 'center',
+
+    }),
+
     html.Div(id = "button-validation", 
+            style = {
+                'fontFamily': 'Times New Roman',
+                'fontSize': 15,
+                'fontStyle': 'italic',
+                'textAlign': 'center',
+                'fontWeight': 'normal',
+                'color': 'red',
+                'marginBottom': '20px',
+                'persistence': 'False'}
+    ),
+
+    html.Div(id = "stop-validation", 
             style = {
                 'fontFamily': 'Times New Roman',
                 'fontSize': 15,
@@ -271,6 +312,7 @@ app.layout = html.Div([
                                 {'name': 'Người dùng đăng nhập', 'id': 'Người dùng đăng nhập'},
                                 {'name': 'Yêu cầu nạp tiền', 'id': 'Yêu cầu nạp tiền'}],
                         data=df.to_dict("records"),
+                        page_size= 50,
                         style_table = {"marginLeft": "10px","marginRight": "50px",},
                         style_cell_conditional=[
                             {
@@ -329,6 +371,7 @@ app.layout = html.Div([
     'marginBottom': '30px',}
 )
 
+app.layout = server_layout
 
 def save_file(name, content):
     """Decode and store a file uploaded with Plotly Dash."""
@@ -405,9 +448,9 @@ def update_file_list(uploaded_filenames, uploaded_file_contents, n_clicks):
 
 
 @app.callback(
-    [Output('button-validation', 'children'), Output('run', 'n_clicks')], 
+    [Output('button-validation', 'children'), Output('run', 'n_clicks'),], 
     [Input('run', 'n_clicks'), Input('num_links', 'value'),
-    Input('demo-dropdown', 'value'), Input('mc_input', 'value')])
+    Input('demo-dropdown', 'value'), Input('mc_input', 'value'),])
 def button_validation(n_clicks, num_links, method, url):
     changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
     if ("run" in changed_id):
@@ -431,6 +474,29 @@ def button_validation(n_clicks, num_links, method, url):
             return [None, 0]
     else:
         return [None, 0]
+
+
+@app.callback(
+    [Output('stop-validation', 'children'), Output('stop', 'n_clicks')], 
+    [Input('stop', 'n_clicks'), Input('run', 'n_clicks')])
+def stop_validation(stop_clicks, n_clicks):
+    global proc
+    changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
+    if ("stop" in changed_id):
+        if stop_clicks > 0:
+            if (proc != None) and (n_clicks >= 1):
+                proc.terminate()
+                return ["Chương trình đã dừng chạy! Để chạy lại từ đầu hãy reload page.", 0]
+            if (proc != None) and (n_clicks < 1):
+                return ["Chương trình chưa bắt đầu chạy!", 0]
+            if (proc == None) and (n_clicks < 1):
+                return ["Chương trình chưa bắt đầu chạy!", 0]
+            if (proc == None) and (n_clicks >= 1):
+                return [None, 0]
+        else:
+            return [None, 0]
+    else:
+        return [None, 0]
         
 
 @app.callback(
@@ -440,6 +506,7 @@ def button_validation(n_clicks, num_links, method, url):
     Input('demo-dropdown', 'value'), Input('mc_input', 'value'),],
 )
 def run_code(uploaded_filenames, uploaded_file_contents, value, n_clicks, method, url):
+    global proc
     if method == "Upload file CSV":
         if (n_clicks != None) and (n_clicks > 0):
             
@@ -455,8 +522,9 @@ def run_code(uploaded_filenames, uploaded_file_contents, value, n_clicks, method
                     elif "xls" in str(path):
                         xlsfile = path
             
-            os.system('python3 run_scraper.py '+ mc_file + ' ' + xlsfile + ' ' + str(value) + ' ' + RELATED_URLS)
+            #os.system('python3 run_scraper.py '+ mc_file + ' ' + xlsfile + ' ' + str(value) + ' ' + RELATED_URLS)
             
+            proc = subprocess.Popen(['python3 run_scraper.py '+ mc_file + ' ' + xlsfile + ' ' + str(value) + ' ' + RELATED_URLS], shell=True)
             return [ None, None]
 
         else:
@@ -474,8 +542,9 @@ def run_code(uploaded_filenames, uploaded_file_contents, value, n_clicks, method
                     if "xls" in str(path):
                         xlsfile = path
 
-            os.system('python3 run_scraper.py '+ url + ' ' + xlsfile + ' ' + str(value) + ' ' + RELATED_URLS)
+            #os.system('python3 run_scraper.py '+ url + ' ' + xlsfile + ' ' + str(value) + ' ' + RELATED_URLS)
             
+            proc = subprocess.Popen(['python3 run_scraper.py '+ url + ' ' + xlsfile + ' ' + str(value) + ' ' + RELATED_URLS], shell=True)
             return [ None, None]
 
         else:
@@ -492,7 +561,7 @@ def show_result(n_intervals, n_clicks):
             try:
                 res = pd.read_csv(RESULT_CSV, encoding="utf8")
             except:
-                time.sleep(3)
+                time.sleep(5)
                 res = pd.read_csv(RESULT_CSV, encoding="utf8")
 
             count = len(res.to_dict("records"))

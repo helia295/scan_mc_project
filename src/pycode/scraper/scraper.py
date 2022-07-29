@@ -10,7 +10,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
-
 #MAX_LINKS = 5     # max follow links per merchant
 #DRIVER_PATH="./config/chromedriver"
 
@@ -73,8 +72,8 @@ class Driver:
 
 
     def __del__(self):
-        if self.driver != None:
-            self.driver.quit() # clean up driver when we are cleaned up
+        #if self.driver != None:
+        self.driver.quit() # clean up driver when we are cleaned up
         #print('The driver has terminated.')
 
 
@@ -289,7 +288,6 @@ def main():
         if web_dict != {}:
             dict_list.append(web_dict)
             stt+=1
-
     
     headers = ["Website", "Keywords tìm thấy", "Link liên kết ngoài", "Người dùng đăng nhập", "Yêu cầu nạp tiền"]
 
@@ -298,7 +296,6 @@ def main():
         writer.writeheader()
         writer.writerows(dict_list)
     
-
     # close the driver.
     driver.quit()
 
