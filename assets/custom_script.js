@@ -1,2 +1,8 @@
 
-alert('If you see this alert, then your custom JavaScript script has run!')
+document.addEventListener('keydown', (e) => {
+    e = e || window.event;
+    if ((e.keyCode == 116)){
+        e.preventDefault();
+        alert("Nút F5 đã bị vô hiệu hoá!")
+    }
+});

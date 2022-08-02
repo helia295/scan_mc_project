@@ -15,6 +15,7 @@ import time
 from dotenv import dotenv_values
 import subprocess
 
+__name__ = '__main__'
 config = dotenv_values("./.env")
 
 
@@ -34,7 +35,7 @@ df = pd.read_csv(SAMPLE_FILE)
 
 # Normally, Dash creates its own Flask server internally. By creating our own,
 # we can create a route for downloading files directly:
-external_scripts = [{'src':'/assets/custom_script.js'}]
+external_scripts = [{'src':'./assets/custom_script.js'}]
 server = Flask(__name__)
 app = dash.Dash(__name__, server=server, external_scripts = external_scripts)
 app.title = 'CÔNG CỤ SCAN WEBSITE CỦA MERCHANT'
