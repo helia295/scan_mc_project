@@ -34,8 +34,9 @@ df = pd.read_csv(SAMPLE_FILE)
 
 # Normally, Dash creates its own Flask server internally. By creating our own,
 # we can create a route for downloading files directly:
+external_scripts = [{'src':'/assets/custom_script.js'}]
 server = Flask(__name__)
-app = dash.Dash(server=server)
+app = dash.Dash(__name__, server=server, external_scripts = external_scripts)
 app.title = 'CÔNG CỤ SCAN WEBSITE CỦA MERCHANT'
 
 
@@ -391,7 +392,7 @@ def button_on_off(stop_clicks, n_clicks):
                     'marginRight': 20,
                     'verticalAlign': 'middle',}
     run_button_off = {'backgroundColor': '#d3d3d3',
-                    'color': '#004d99',
+                    'color': '#616161',
                     'height': '30px',
                     'width': '200px',
                     'borderWidth': '1px',
@@ -403,34 +404,34 @@ def button_on_off(stop_clicks, n_clicks):
                     'marginRight': 20,
                     'verticalAlign': 'middle',}
     stop_button_on = {'backgroundColor': 'white',
-                            'color': 'red',
-                            'height': '30px',
-                            'width': '200px',
-                            'borderWidth': '1px',
-                            'borderStyle': 'solid',
-                            'borderColor': 'red',
-                            'textAlign': 'center',
-                            'fontFamily': 'Times New Roman',
-                            'fontSize': 17,
-                            'verticalAlign': 'middle',}
+                    'color': 'red',
+                    'height': '30px',
+                    'width': '200px',
+                    'borderWidth': '1px',
+                    'borderStyle': 'solid',
+                    'borderColor': 'red',
+                    'textAlign': 'center',
+                    'fontFamily': 'Times New Roman',
+                    'fontSize': 17,
+                    'verticalAlign': 'middle',}
     stop_button_off = {'backgroundColor': '#d3d3d3',
-                            'color': 'red',
-                            'height': '30px',
-                            'width': '200px',
-                            'borderWidth': '1px',
-                            'borderStyle': 'solid',
-                            'borderColor': 'red',
-                            'textAlign': 'center',
-                            'fontFamily': 'Times New Roman',
-                            'fontSize': 17,
-                            'verticalAlign': 'middle',}
+                    'color': '#616161',
+                    'height': '30px',
+                    'width': '200px',
+                    'borderWidth': '1px',
+                    'borderStyle': 'solid',
+                    'borderColor': 'red',
+                    'textAlign': 'center',
+                    'fontFamily': 'Times New Roman',
+                    'fontSize': 17,
+                    'verticalAlign': 'middle',}
     if (n_clicks < 1) and (stop_clicks < 1):
         return [stop_button_off, True, run_button_on, False]
     elif (n_clicks >= 1) and (stop_clicks < 1):
         return [stop_button_on, False, run_button_off, True]
     elif (n_clicks < 1) and (stop_clicks >= 1):
         return [stop_button_off, True, run_button_on, False]
-    else:
+    elif (n_clicks >= 1) and (stop_clicks >= 1):
         return [stop_button_on, False, run_button_off, True]
 
 
