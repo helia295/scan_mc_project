@@ -14,6 +14,7 @@ import dash
 import time
 from dotenv import dotenv_values
 import subprocess
+import psutil
 
 __name__ = '__main__'
 config = dotenv_values("./.env")
@@ -28,6 +29,9 @@ LOGO_PATH = "./assets/logo.png"
 
 #to store current process
 proc = None
+
+#to store total number of merchants
+mc_count = 0
 
 encoded_image = base64.b64encode(open(LOGO_PATH, 'rb').read())
 
@@ -50,6 +54,16 @@ def server_layout():
     global proc
     if proc != None:
         proc.terminate()
+        '''
+        proname = 'chromedriver.exe'
+        chromename= 'chrome.exe'
+        for p in psutil.process_iter():
+            if p.name() == proname or p.name() == chromename:
+                try:
+                    p.kill()
+                except:
+                    print('Processed is terminated already')
+        '''
     return html.Div([
         html.Div(children=[
             html.H1(
@@ -495,8 +509,9 @@ def button_validation(n_clicks, num_links, method, url):
     changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
     if ("run" in changed_id):
         if n_clicks > 0:
-            if os.path.isfile(RESULT_CSV):
-                os.remove(RESULT_CSV)
+            #if os.path.isfile(RESULT_CSV):
+                #os.remove(RESULT_CSV)
+                #pass
             files = uploaded_files()
             if method == None:
                 return ["Hãy chọn phương pháp upload danh sách MC ở Bước 1!", 0]
@@ -526,6 +541,15 @@ def stop_validation(stop_clicks, n_clicks):
         if stop_clicks > 0:
             if (proc != None) and (n_clicks >= 1):
                 proc.terminate()
+                '''proname = 'chromedriver.exe'
+                chromename= 'chrome.exe'
+                for p in psutil.process_iter():
+                    if p.name() == proname or p.name() == chromename:
+                        try:
+                            p.kill()
+                        except:
+                            print('Processed is terminated already')'''
+                        
                 return ["Chương trình đã dừng chạy! Để chạy lại từ đầu hãy xoá và thực hiện lại từ Bước 1.", 1]
             if (proc != None) and (n_clicks < 1):
                 return ["Chương trình chưa bắt đầu chạy!", 0]
@@ -547,11 +571,13 @@ def stop_validation(stop_clicks, n_clicks):
 )
 def run_code(uploaded_filenames, uploaded_file_contents, value, n_clicks, method, url):
     global proc
+    global mc_count
     if method == "Upload file CSV":
         if (n_clicks != None) and (n_clicks > 0):
             
             for filename in os.listdir(UPLOAD_DIRECTORY):
                 path = os.path.join(UPLOAD_DIRECTORY, filename)
+                
                 if " " in filename:
                     filename = filename.replace(" ", "")
                     os.rename(path, os.path.join(UPLOAD_DIRECTORY, filename))
@@ -561,10 +587,13 @@ def run_code(uploaded_filenames, uploaded_file_contents, value, n_clicks, method
                         mc_file = path
                     elif "xls" in str(path):
                         xlsfile = path
-            
-            #os.system('python3 run_scraper.py '+ mc_file + ' ' + xlsfile + ' ' + str(value) + ' ' + RELATED_URLS)
-            
-            proc = subprocess.Popen(['python3 run_scraper.py '+ mc_file + ' ' + xlsfile + ' ' + str(value) + ' ' + RELATED_URLS], shell=True)
+            #os.system('python run_scraper.py '+ mc_file + ' ' + xlsfile + ' ' + str(value) + ' ' + RELATED_URLS)
+            from src.pycode.scraper.scraper import get_URLs_to_list
+            mc_count = len(get_URLs_to_list(mc_file))
+            raw_command = r'python3 /Users/heliadinh/Desktop/scan_mc_project/run_scraper.py'
+            proc = subprocess.Popen(f"{raw_command} {mc_file} {xlsfile} {value} {RELATED_URLS}" , shell=True)
+            #print([r'python D:\Repos\scan_mc_project\run_scraper.py '+ mc_file + ' ' + xlsfile + ' ' + str(value) + ' ' + RELATED_URLS])
+            #proc = subprocess.Popen([r'python D:\Repos\scan_mc_project\run_scraper.py '+ mc_file + ' ' + xlsfile + ' ' + str(value) + ' ' + RELATED_URLS], shell=True)
             return [ None, None]
 
         else:
@@ -582,9 +611,11 @@ def run_code(uploaded_filenames, uploaded_file_contents, value, n_clicks, method
                     if "xls" in str(path):
                         xlsfile = path
 
-            #os.system('python3 run_scraper.py '+ url + ' ' + xlsfile + ' ' + str(value) + ' ' + RELATED_URLS)
-            
-            proc = subprocess.Popen(['python3 run_scraper.py '+ url + ' ' + xlsfile + ' ' + str(value) + ' ' + RELATED_URLS], shell=True)
+            mc_count = 1
+            #os.system('python run_scraper.py '+ url + ' ' + xlsfile + ' ' + str(value) + ' ' + RELATED_URLS)
+            raw_command = r'python3 /Users/heliadinh/Desktop/scan_mc_project/run_scraper.py'
+            proc = subprocess.Popen(f"{raw_command} {url} {xlsfile} {value} {RELATED_URLS}" , shell=True)
+            #proc = subprocess.Popen(['python ../../run_scraper.py '+ url + ' ' + xlsfile + ' ' + str(value) + ' ' + RELATED_URLS], shell=True)
             return [ None, None]
 
         else:
@@ -601,12 +632,12 @@ def show_result(n_intervals, n_clicks):
             try:
                 res = pd.read_csv(RESULT_CSV, encoding="utf8")
             except:
-                time.sleep(5)
+                time.sleep(10)
                 res = pd.read_csv(RESULT_CSV, encoding="utf8")
 
             count = len(res.to_dict("records"))
             if count > 0:
-                return [res.to_dict("records"), "Đã scan xong "+str(count)+ " merchant(s)."]
+                return [res.to_dict("records"), "Đã scan xong " + str(count) + "/" + str(mc_count) + " merchant(s)."]
             else:
                 return [res.to_dict("records"), "Đang scan..."]
         else:
